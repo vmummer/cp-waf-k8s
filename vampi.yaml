@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: vampi 
+  name: vampi 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vampi
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: vampi 
+    spec:
+      containers:
+      - image: erev0s/vampi
+        imagePullPolicy: IfNotPresent
+        name: vampi 
+        ports:
+        - containerPort: 5000 
+        resources: {}
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: vampi 
+  name: vampi 
+spec:
+  ports:
+  - name: vampi 
+    port: 5000
+    protocol: TCP
+    targetPort: 5000
+  selector:
+    app: vampi 
+  type: ClusterIP 
+
+status:
+  loadBalancer: {}

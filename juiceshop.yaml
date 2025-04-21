@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: juiceshop
+  name: juiceshop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: juiceshop
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: juiceshop
+    spec:
+      containers:
+      - image: bkimminich/juice-shop
+        imagePullPolicy: IfNotPresent
+        name: juiceshop
+        ports:
+        - containerPort: 3000
+        resources: {}
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: juiceshop
+  name: juiceshop
+spec:
+  ports:
+  - name: 3000-3000
+    port: 3000
+    protocol: TCP
+    targetPort: 3000
+  selector:
+    app: juiceshop
+  type: ClusterIP 
+
+status:
+  loadBalancer: {}

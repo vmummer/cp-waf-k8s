@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: testhost 
+spec:
+  containers:
+  - name: waf-k8s-testhost 
+#    image: appsec-demo_test-host:latest 
+    image: localhost:32000/waf-k8s-testhost
+    imagePullPolicy: IfNotPresent
+#
+    command: ["/bin/sh", "-ec", "while :; do echo '.'; sleep 5 ; done"]
+    volumeMounts:
+      - mountPath: /home/cp
+        name: cp-files
+
+  volumes:
+  - name: cp-files
+    hostPath:
+      path: /home/lab/waf-k8s/cp 
+      type: Directory

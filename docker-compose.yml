@@ -1,0 +1,35 @@
+#version:  '3'
+
+services:
+  juiceshop:
+    container_name: juiceshop
+    image: bkimminich/juice-shop
+    #build:
+    #  dockerfile: Dockerfile
+    #  context: ./juice-shop
+    ports:
+        - '3000:3000'
+
+
+  testhost:
+    container_name: cp-tester
+    stdin_open: true
+    tty: true
+    build:
+       dockerfile: Dockerfile
+       context: ./testhost
+    volumes:
+      - ./tester/data:/home/web-scraper/data
+    hostname: tester
+
+
+  vampi:
+    image: erev0s/vampi
+    container_name: vampi 
+    ports: 
+      - '5000:5000'
+    hostname: vampi
+    environment:
+      - vulnerable=1
+      - tokentimetolive=3600
+
