@@ -9,10 +9,10 @@ DOCKER_HOST="`hostname -I| awk ' {print $1}'`"
 WAPAPP=cp-appsec-cloudguard-waf-ingress-nginx-controller
 INGRESS_IP="`microk8s.kubectl get  svc $WAPAPP -o json | jq -r  .status.loadBalancer.ingress[].ip`"
 WAFPOD="`microk8s.kubectl get pods -o=jsonpath='{.items..metadata.name}' | grep cp-appsec`"
-alias cptrbad='_cptrbad() { echo "April 2025  - Adapted for K8S Lab" ; url=$1; [ $# -eq 0 ] && url="http://juiceshop.lab"; microk8s.kubectl exec -it  testhost  -n testhost -- bash -c "url=$url && cd /home/juice-shop-solver && python main.py $url";}; _cptrbad'
+alias cptrbad='_cptrbad() { echo "Dec 2024  - Adapted for K8S Lab" ; url=$1 ;microk8s.kubectl exec -it  testhost  -n testhost -- bash -c "url=$url && cd /home/juice-shop-solver && python main.py $url";}; _cptrbad'
 alias cptrgood='bash cp/cp_test_good.sh'
 alias cpapi='bash cp/cp_api_trainer.sh'
-alias cpapitrainer='microk8s.kubectl exec -it testhost -n testhost -- bash /home/cp/cp_api_tester.sh'
+alias cpapitrainer='microk8s.kubectl exec -it testhost -n testhost -- bash /home/lab/k8s/cp/cp_api_tester.sh'
 alias cptesthost='microk8s.kubectl exec -it testhost -n testhost -- bash'
 alias cpnano='microk8s.kubectl exec -it $WAFPOD -- cpnano'
 alias cpuninstall='microk8s.kubectl exec -it $WAFPOD --  /usr/sbin/cpnano --uninstall'
