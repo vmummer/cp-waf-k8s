@@ -24,7 +24,7 @@ data:
     lab:53 {
       errors
       hosts {
-        172.29.126.200 juiceshop.lab vampi.lab 
+        172.29.155.200 juiceshop.lab vampi.lab 
       }
     }
 kind: ConfigMap

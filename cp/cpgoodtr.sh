@@ -14,7 +14,8 @@ fi
 for (( i=0; i<$repeat; ++i)); do
 	loop=$(($i+1))
 	echo "$loop of $repeat) Testing Against URL: $host"
-	python /home/web-scraper/websitescrap.py $host
+	microk8s.kubectl exec -it -n testhost testhost -- python /home/web-scraper/websitescrap.py $host
+	 
 
 
 done

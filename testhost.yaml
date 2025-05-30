@@ -6,7 +6,8 @@ spec:
   containers:
   - name: waf-k8s-testhost 
 #    image: appsec-demo_test-host:latest 
-    image: localhost:32000/waf-k8s-testhost
+    image: localhost:32000/testhost:latest
+  #    imagePullPolicy: Never  
     imagePullPolicy: IfNotPresent
 #
     command: ["/bin/sh", "-ec", "while :; do echo '.'; sleep 5 ; done"]
@@ -17,5 +18,5 @@ spec:
   volumes:
   - name: cp-files
     hostPath:
-      path: /home/lab/waf-k8s/cp 
+      path: /home/lab/cp-waf-k8s/cp 
       type: Directory

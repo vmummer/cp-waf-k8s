@@ -5,7 +5,7 @@
 # Write by Vince Mammoliti - vincem@checkpoint.com
 # Version 0.6  - Sept 25, 2024
 # Version 0.7  - Dec  10, 2024 - Modified to support microK8s 
-#
+# Version 0.8  - May   1, 2025 - Added sqlmap --update functionality 
 #
 #/usr/bin/bash
 
@@ -27,17 +27,19 @@ NC='\033[0m' # No Color
 BFLAG=0
 INITDB=0
 SFLAG=0	
+SUPDATE=0
 
 usage(){
 >&2 cat << EOF
 $0 is an API training tool to demonstrate the API learning capability of the Check Point Cloud Guard WAF
-Written by Vince Mammoliti - vincem@checkpoint.com - Dec 2024
+Written by Vince Mammoliti - vincem@checkpoint.com -  May 2025 
 
 Usage: $0 [OPTIONS...] [URL of VAMPI host - defaults to $HOST] 
   -v | --verbose             provides details of commands excuited against host  
   -m | --malicious           send malicious type traffic (Default will be know good training traffic)
   -r | --repeat              repeat the number of times to send api training requests. defaults to 1 
   -s | --sql		     uses sqlmap to attempt to dump database
+  -u | --sqlupdate	     update sqlmap  
   -i | --initdb              initialize Vampi Database
   -h | --help                this help screen is displayed
 EOF
@@ -70,7 +72,7 @@ initdb(){
 	     OUTPUT=$(curl -sS -H 'accept: application/json' -X 'GET' ${HOST}/createdb)
 	     if echo "$OUTPUT" |  grep -q -o -P '.{0,20}Application Security.{0,4}'; then
 	            echo -e "${RED}Check Point - Application Security Blocked ${NC}"
-		    echo -e "Reexecute the command directly the non protected host URL ie: $0 --initdb http://juiceshop.local:5000"
+		    echo -e "Reexecute the command directly the non protected host URL ie: $0 --initdb http://vampi.lab:5000"
 		    exit 1
 	     fi	       
      else 
@@ -83,10 +85,10 @@ initdb(){
 
 sqldump(){
 # The follow was removed because sqlmap was added to the tester container to run
-#if ! [ -x "$(command -v sqlmap)" ]; then
-#	        echo "sqlmap is not installed - please install 'apt-get install sqlmap'" >&2
-#		        exit 1
-#f
+if ! [ -x "$(command -v sqlmap)" ]; then
+	        echo "sqlmap is not installed - please install 'apt-get install sqlmap'" >&2
+	        exit 1
+fi 
 $vResponse "HOST: ${HOST}"
 gettoken
 #sqlmap -u ${HOST}"/users/v1/*name1*" --method=GET --headers="Accept: application/json\nAuthorization: Bearer $TOKEN \nHost: ${TOKEN} " --dbms=sqlite --dump
@@ -95,6 +97,21 @@ sqlmap -u $HOST"/users/v1/*name1*" --method=GET --headers="Accept: application/j
 
 exit 0
 }
+
+sqlupdate(){
+# 25-05-01 added sqlmap update feature - allows for updating of the sqlmap info from sript 
+if ! [ -x "$(command -v sqlmap)" ]; then
+                echo "sqlmap is not installed - please install 'apt-get install sqlmap'" >&2
+                exit 1
+fi
+
+sqlmap --update
+                                                                                                                        exit 0
+}
+
+
+
+
 
 ifblocked(){
   if echo "$OUTPUT" |  grep -q -o -P '.{0,20}Application Security.{0,4}'; then
@@ -155,7 +172,7 @@ done
 exit 1
 }
 
-args=$(getopt -a -o vr:smi --long help,verbose,repeat:,sql,malicious,initdb -- "$@")
+args=$(getopt -a -o vr:smiu --long help,verbose,repeat:,sql,malicious,initdb,sqlupdate -- "$@")
 
 
 
@@ -172,6 +189,7 @@ do
 	-h | --help)      usage   ; shift   ;;
 	-r | --repeat)    REPEAT=$2  ; shift 2 ;;
 	-s | --sql )      SFLAG=1 ; shift  ;;
+	-u | --sqlupdate) SUPDATE=1 ; shift ;;
 	-m | --malicious) BFLAG=1  ; shift ;; 
 	-i | --initdb)	  INITDB=1 ; shift ;;
 	--) shift; break ;;
@@ -196,6 +214,9 @@ elif [ $SFLAG -eq 1 ] ; then
 	checkdb
 	sqldump
 	exit 1
+elif [ $SUPDATE -eq 1 ] ; then
+        sqlupdate 
+        exit 1
 else 
 checkdb
 echo -e "\n WAF API - Training Traffic - Simulator - $0 -h for options \n"

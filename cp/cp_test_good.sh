@@ -1,62 +1,27 @@
 #/usr/bin/bash
-# April 21 2025 - Modified to run in K8S pod.
-# Written by Vince Mammoliti - vincem@checkpoint.com
-
-HOST="http://juiceshop.lab"
-REPEAT=1
-
-
-usage(){
-	>&2 cat << EOF
-$0 is traffic generator to create non malicious web traffic against a Web Test Host
-Scripted by Vince Mammoliti - vincem@checkpoint.com - April 2025
-
-Usage: $0 [OPTIONS....] URL of Web Host - defaults to $HOST]
-  -r | --repeat          repeat the number of times to crawl the Web Host
-  -h | --help           this help screen is displayed
-
-EOF
-exit 1
-}
-
-
-
-# Start of main script
-
-args=$(getopt -a -o vr:smi --long help,verbose,repeat:,sql,malicious,initdb -- "$@")
-
-eval set -- ${args}
-while :
-do
-	case $1 in
-		-h | --help)    usage	; shift ;;
-		-r | --repeat)  REPEAT=$2 ; shift 2 ;;
-		--) shift; break ;;
-		*)  usage; exit 1;;
-	esac
-
-done
-
-
-if [ ! -z "$@" ]; then     # Check to see if there is a URL on the command, if so replace
-		 HOST=$@
+#DOCKER_HOST="`hostname -I| awk ' {print $1}'`"
+# 2025-Apr-29 Modified from docker to K8S Lab
+host="http://juiceshop.lab:80"
+repeat=1
+if [ -z "$1" ]; then
+        echo "Usage  cptrgood <URL> <repeat>  - Create Good Traffic against Test Host. " 
+	echo "Defaulting to Test Host URL: $host and repeat $repeat"
+else
+	if [[ ! ${1,,} == *"http"* ]]; then
+		echo "ERROR: URL must be http:// or https:// - You have provided url of $host"
+		echo "Usage:  cptrgood <URL> optional <repeat> - defauts to $host and repeat $repeat"
+		exit
+	fi
+	host=$1
+	repeat=$2
+	if [ -z "$repeat" ]; then repeat=1 ;fi 
 fi
 
-
-echo "HOST: ${HOST}"
-
-
-
-
-
-
-
-
-
-
-
-for (( i=0; i<$REPEAT; ++i)); do
+for (( i=0; i<$repeat; ++i)); do
 	loop=$(($i+1))
-	echo "$loop of $REPEAT) Testing Against URL: $HOST"
-	python /home/web-scraper/websitescrap.py $HOST
+	echo "$loop of $repeat) Testing Against URL: $host"
+	python /home/web-scraper/websitescrap.py $host
+
+
 done
+
