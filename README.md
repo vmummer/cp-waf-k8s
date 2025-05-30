@@ -2,8 +2,9 @@
  
  The purpose of this repository is to provided a deployment demonstration of Check Points WAF and API protection in a Kubernetes(K8s) environment.  
    
- The enhancement allows for running on Windows WSL if required or any current standard Ubuntu linux distribution. It also includes an additional Client Host for traffic generations of good and bad web and API traffic.
-  
+ Some of the optional enhancement include tweeaks to allow to run this demonstration on a Standard Windows Ubuntu WSL system. 
+ 
+The repository also includes a Client Host Pod used to generations web traffic, malicous web traffic, API training tool and API attach tool in order to show case the functional of the Check Point WAF/API Protect system.   
 <Add more about design and Pods>
 
  
