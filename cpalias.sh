@@ -3,6 +3,10 @@
 # Dec 3, 2024 added K8S Ingress IP address
 # Mar 31, 2025 Added 
 # April 17, 2025 - Adding the user of helm chart and dynamic Pod names.
+# June 2, 2025 - Added hostname Capitals check.
+#
+
+if [[ hostname =~ [A-Z] ]]; then  echo ">>> WARNING <<< hostname contains Capital Letters. When using microk8s the capital letters in the hostname will cause many different type of failures. Rename host name to all lower case to continue!"; exit 1; fi
 
 echo "Adding Check Point CNAP & WAF on Kubernetes Lab Alias Commands.  Use cphelp for list of commands"
 alias k=microk8s.kubectl
