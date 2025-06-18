@@ -1,0 +1,12 @@
+apiVersion: v1
+items:
+- apiVersion: metallb.io/v1beta1
+  kind: IPAddressPool
+  metadata:
+    name: default-addresspool
+    namespace: metallb-system
+  spec:
+    addresses:
+    - 172.29.155.200/32
+
+kind: List

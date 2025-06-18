@@ -8,7 +8,7 @@
 
 if [[ hostname =~ [A-Z] ]]; then  echo ">>> WARNING <<< hostname contains Capital Letters. When using microk8s the capital letters in the hostname will cause many different type of failures. Rename host name to all lower case to continue!"; exit 1; fi
 
-echo "Adding Check Point CNAP & WAF on Kubernetes Lab Alias Commands.  Use cphelp for list of commands"
+echo "Check Point WAF on Kubernetes Lab Alias Commands.  Use cphelp for list of commands. June 2025"
 alias k=microk8s.kubectl
 alias helm='/snap/bin/microk8s.helm'
 DOCKER_HOST="`hostname -I| awk ' {print $1}'`"

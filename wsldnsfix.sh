@@ -1,3 +1,4 @@
+# https://learn.microsoft.com/en-us/windows/wsl/wsl-config#network-settings
 
 sudo rm /etc/resolv.conf
 sudo bash -c 'echo "nameserver 1.1.1.1" > /etc/resolv.conf'
