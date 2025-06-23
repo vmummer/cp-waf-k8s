@@ -7,7 +7,10 @@
 The repository also includes a Client Host Pod used to generations web traffic, malicous web traffic, API training tool and API attach tool in order to show case the functional of the Check Point WAF/API Protect system.   
 <Add more about design and Pods>
 
- ![image](https://github.com/user-attachments/assets/29c3ae51-ce60-41e9-83ea-677a5d42e072)
+![Screenshot 2025-06-19 162922](https://github.com/user-attachments/assets/0c787b44-14dc-4671-aa2d-dad45521db71)
+
+
+
 
 ## Instructions:
  
