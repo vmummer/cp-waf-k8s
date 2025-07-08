@@ -79,7 +79,7 @@ if [[ ${config[network.generateHosts]} == "false" ]]; then  echo -e "${GREEN}PAS
 
 
 echo -n "6) Check if a nameserver is defined in the /etc/resolv.conf "
-if cat /etc/resolv.conf | grep -q -o 'nameserver'; then echo -e "${GREEN}PASS${NC}"; cat /etc/resolv.conf; 
+if cat /etc/resolv.conf | grep -q -o 'nameserver'; then echo -e "${GREEN}PASS${NC}"; echo -n "    "; cat /etc/resolv.conf; 
 	else echo -e "${RED}FAILED${NC} - No nameserver defined.  Please add 'nameserver 1.1.1.1 to resolve"
 fi
 

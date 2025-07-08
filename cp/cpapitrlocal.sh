@@ -6,6 +6,7 @@
 # Version 0.6  - Sept 25, 2024
 # Version 0.7  - Dec  10, 2024 - Modified to support microK8s 
 # Version 0.8  - May   1, 2025 - Added sqlmap --update functionality 
+# Version 0.9  - July  8, 2025 - Added check for symbolic link for /usr/bin/python 
 #
 #/usr/bin/bash
 
@@ -32,7 +33,7 @@ SUPDATE=0
 usage(){
 >&2 cat << EOF
 $0 is an API training tool to demonstrate the API learning capability of the Check Point Cloud Guard WAF
-Written by Vince Mammoliti - vincem@checkpoint.com -  May 2025 
+Written by Vince Mammoliti - vincem@checkpoint.com -  July 2025 
 
 Usage: $0 [OPTIONS...] [URL of VAMPI host - defaults to $HOST] 
   -v | --verbose             provides details of commands excuited against host  
@@ -106,6 +107,7 @@ if ! [ -x "$(command -v sqlmap)" ]; then
 fi
 
 sqlmap --update
+
                                                                                                                         exit 0
 }
 
@@ -199,6 +201,12 @@ done
 
 if [ ! -z "$@" ]; then     # Check to see if there is a URL on the command, if so replace
 	 HOST=$@
+fi
+
+# 25-07-08 after updating sqlmap, sometime it is looking for /usr/bin/python. If it does not exist, you will see an error
+if ! [ -x "$(command -v python)" ]; then
+                echo -e "\n${RED}[sqlmap] application requires python and system only has python3 installed.${NC}\nTo overcome create a symbolic link for /usr/bin/python by issuing the following: \nsudo ln -s /usr/bin/python3 /usr/bin/python\n"  >&2
+                exit 1
 fi
 
 echo "HOST: ${HOST}"
