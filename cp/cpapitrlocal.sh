@@ -17,6 +17,7 @@ function silentResponse () {
        	:
 }
 
+VERS=0.9
 VFLAG=0
 REPEAT=1
 HOST="http://vampi.lab"
@@ -209,6 +210,7 @@ if ! [ -x "$(command -v python)" ]; then
                 exit 1
 fi
 
+echo -e "Check Point WAF - API Trainer - by Vince Mammoliti - Version ${VERS} 2025"
 echo "HOST: ${HOST}"
 $vResponse "BFLAG: ${BFLAG}"
 if [ $INITDB -eq 1 ]; then
