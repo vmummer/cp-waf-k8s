@@ -1,3 +1,5 @@
+#/usr/bin/bash
+#
 # 2024 - Check Point Software - WAF LAB
 # cp_api_trainer.sh 
 # The following script was created to train the WAF API to learn the API Scheme of VAMPI application to demontrate
@@ -8,7 +10,6 @@
 # Version 0.8  - May   1, 2025 - Added sqlmap --update functionality 
 # Version 0.9  - July  8, 2025 - Added check for symbolic link for /usr/bin/python 
 #
-#/usr/bin/bash
 
 set -euo pipefail
 
