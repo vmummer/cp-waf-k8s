@@ -1,4 +1,4 @@
-##!/usr/bin/env bash
+#/usr/bin/bash
 #
 # 2024 - Check Point Software - WAF LAB
 # cp_api_trainer.sh 
