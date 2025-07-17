@@ -12,6 +12,10 @@ HOST="http://juiceshop.lab:80"
 REPEAT=1
 MODE="good"
 DELAY=1
+RED='\033[0;31m'
+NC='\033[0m' # No Color 
+
+
 
 # Help message
 usage() {
@@ -123,7 +127,7 @@ echo "Finished sending all requests."
 
 
 # Parse options
-while getopts ":m:Rd:r:h" opt; do
+while getopts "mRd:r:h" opt; do
   case ${opt} in
     m )
       MODE="misc"
@@ -159,18 +163,18 @@ Written by Vince Mammoliti - vincem@checkpoint.com - July 2025 (-h) for usage \n
 # Positional argument for URL
 if [ -n "$1" ]; then
   if [[ "$1" != http* ]]; then
-    echo "ERROR: URL must start with http:// or https://"
+    echo -e "${RED}ERROR: URL must start with http:// or https://${NC}"
     exit 2 
   fi
   HOST="$1"
 fi
 
-stripped_host="${HOST#http://}"  && stripped_host="${stripped_host#https://}"
+stripped_host="${HOST#http://}" && stripped_host="${stripped_host#https://}" &&  stripped_host="${stripped_host%%:*}"
 
 if getent hosts "$stripped_host" > /dev/null; then
-  echo "✅ Hostname '$HOST' resolved successfully."
+  echo "✅ Hostname '$stripped_host' resolved successfully."
 else
-  echo "❌ Hostname '$HOST' could not be resolved."
+  echo -e "${RED}❌ Hostname '$stripped_host' could not be resolved.${NC}"
   exit 2
 fi
 echo
@@ -182,7 +186,7 @@ for (( i=0; i<$REPEAT; ++i )); do
 
   if [ "$MODE" == "rate" ]; then
     ratelimit   
-  elif [ "$MODE" == "bad"  ]; then
+  elif [ "$MODE" == "misc"  ]; then
     cd /home/juice-shop-solver && python main.py "$HOST"
   else
     python /home/web-scraper/websitescrap.py "$HOST"
