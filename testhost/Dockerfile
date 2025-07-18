@@ -21,6 +21,7 @@ RUN apt-get update && \
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
+    pip install "setuptools<67" && \
     pip install --no-cache-dir -r requirements.txt
 
 RUN git clone --depth 1 https://github.com/vmummer/web-scraper.git /home/web-scraper && \
@@ -53,7 +54,7 @@ RUN apt-get update && \
 
 
 # Copy local files
-COPY cp /home/cp
+COPY cp /home/
 
 WORKDIR /home/cp
 

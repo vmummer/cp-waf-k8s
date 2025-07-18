@@ -4,10 +4,12 @@ metadata:
   name: testhost 
 spec:
   containers:
-  - name: waf-k8s-testhost 
-#  image: localhost:32000/testhost:current
-    image: vmummer/cpwaftesthost:current
-  #    imagePullPolicy: Never  
+#  - name: waf-k8s-testhost 
+  - name:  cpwaftesthost 
+#    image: appsec-demo_test-host:latest 
+#    image: localhost:32000/testhost:latest
+     image: vmummer/cpwaftesthost:latest
+#    imagePullPolicy: Never  
     imagePullPolicy: IfNotPresent
 #
     command: ["/bin/sh", "-ec", "while :; do echo '.'; sleep 5 ; done"]
