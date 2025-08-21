@@ -54,7 +54,7 @@ RUN apt-get update && \
 
 
 # Copy local files
-COPY cp /home/
+COPY cp /home/cp
 
 WORKDIR /home/cp
 

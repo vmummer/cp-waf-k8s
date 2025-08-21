@@ -8,10 +8,10 @@
 
 if [[ hostname =~ [A-Z] ]]; then  echo ">>> WARNING <<< hostname contains Capital Letters. When using microk8s the capital letters in the hostname will cause many different type of failures. Rename host name to all lower case to continue!"; exit 1; fi
 
+VER=2.0
 echo "Check Point WAF on Kubernetes Lab Alias Commands.  Use cphelp for list of commands. Ver: $VER"
 alias k=microk8s.kubectl
 alias helm='/snap/bin/microk8s.helm'
-VER=2.0
 DOCKER_HOST="`hostname -I| awk ' {print $1}'`"
 WAPAPP=cp-appsec-cloudguard-waf-ingress-nginx-controller
 INGRESS_IP="`microk8s.kubectl get  svc $WAPAPP -o json | jq -r  .status.loadBalancer.ingress[].ip`"
