@@ -16,7 +16,7 @@ alias helm='/snap/bin/microk8s.helm'
 DOCKER_HOST="`hostname -I| awk ' {print $1}'`"
 WAPAPP=cp-appsec-cloudguard-waf-ingress-nginx-controller
 
-if k get pods | grep -q -o 'cp-appsec' ; then 
+if k get pods -A | grep -q -o 'cp-appsec' ; then 
 	INGRESS_IP="`microk8s.kubectl get  svc $WAPAPP -o json | jq -r  .status.loadBalancer.ingress[].ip`"
 	get_WAFPOD ()  {
 	WAFPOD="`microk8s.kubectl get pods -o=jsonpath='{.items..metadata.name}' | grep cp-appsec`"
