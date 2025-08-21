@@ -5,19 +5,24 @@
 # April 17, 2025 - Adding the user of helm chart and dynamic Pod names.
 # June 2, 2025 - Added hostname Capitals check.
 # July 18, 2025 - Updated aliase to reflect the updated selfcontained testhost
+# Aug 20, 2025 - Added check to see if cp-appsec was enabled before trying to get variables.
 
 if [[ hostname =~ [A-Z] ]]; then  echo ">>> WARNING <<< hostname contains Capital Letters. When using microk8s the capital letters in the hostname will cause many different type of failures. Rename host name to all lower case to continue!"; exit 1; fi
 
-VER=2.0
+VER=2.1
 echo "Check Point WAF on Kubernetes Lab Alias Commands.  Use cphelp for list of commands. Ver: $VER"
 alias k=microk8s.kubectl
 alias helm='/snap/bin/microk8s.helm'
 DOCKER_HOST="`hostname -I| awk ' {print $1}'`"
 WAPAPP=cp-appsec-cloudguard-waf-ingress-nginx-controller
-INGRESS_IP="`microk8s.kubectl get  svc $WAPAPP -o json | jq -r  .status.loadBalancer.ingress[].ip`"
-get_WAFPOD ()  {
+
+if k get pods | grep -q -o 'cp-appsec' ; then 
+	INGRESS_IP="`microk8s.kubectl get  svc $WAPAPP -o json | jq -r  .status.loadBalancer.ingress[].ip`"
+	get_WAFPOD ()  {
 	WAFPOD="`microk8s.kubectl get pods -o=jsonpath='{.items..metadata.name}' | grep cp-appsec`"
-}
+	}
+fi
+
 #alias cptrbad='_cptrbad() { echo "Dec 2024  - Adapted for K8S Lab" ; url=$1 ;k exec -it  testhost  -n testhost -- bash -c "url=$url && cd /home/juice-shop-solver && python main.py $url";}; _cptrbad'
 alias cptraffic='k exec -it testhost -n testhost -- bash /home/cp/cp_traffic.sh'
 alias cpapi='bash cp/cp_api_trainer.sh'
