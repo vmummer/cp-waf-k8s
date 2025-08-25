@@ -6,14 +6,15 @@
 # June 2, 2025 - Added hostname Capitals check.
 # July 18, 2025 - Updated aliase to reflect the updated selfcontained testhost
 # Aug 20, 2025 - Added check to see if cp-appsec was enabled before trying to get variables.
-
+# Aug 15, 2025 - Added variable $HOST_IP and command cpmetallb 
 if [[ hostname =~ [A-Z] ]]; then  echo ">>> WARNING <<< hostname contains Capital Letters. When using microk8s the capital letters in the hostname will cause many different type of failures. Rename host name to all lower case to continue!"; exit 1; fi
 
-VER=2.1
+VER=2.2
 echo "Check Point WAF on Kubernetes Lab Alias Commands.  Use cphelp for list of commands. Ver: $VER"
 alias k=microk8s.kubectl
+alias kubectl=microk8s.kubectl
 alias helm='/snap/bin/microk8s.helm'
-DOCKER_HOST="`hostname -I| awk ' {print $1}'`"
+HOST_`IP="`hostname -I| awk ' {print $1}'`"
 WAPAPP=cp-appsec-cloudguard-waf-ingress-nginx-controller
 
 if k get pods -A | grep -q -o 'cp-appsec' ; then 
@@ -41,8 +42,9 @@ alias cpnanor='get_WAFPOD && k exec -it $WAFPOD -- cpnano -s | grep -E "^Registr
 #alias cpwipe='docker-compose down &&  docker system prune -a'
 alias cpcert='sh cp/cp_get_cert.sh'
 alias cpfetch='git  config --global http.sslverify false && git clone https://github.com/vmummer/cp-waf-k8s.git'
-alias cphost='printf "Docker Host IP address used: $DOCKER_HOST \n"'
+alias cphost='printf " Host IP address used: $HOST_IP \n"'
 alias cpingress='printf "Ingress IP address used: $INGRESS_IP \n"'
+alias cpmetallb='microk8s enable metallb:$HOST_IP-$HOST_IP
 alias cphelp='printf "Check Point Lab Commands:     Ver: $VER\n
 cpnano        Show detail status of AppSec Agent ( use as cpnano -s)
 cpnanol       Show last update of the AppSec Agent
@@ -53,6 +55,7 @@ cphost        Shows the IP address of the Docker Host used
 cpingress     Shows the IP address of the Ingress Controller used
 cphelp        Alias Command to help with Check Point Lab
 cpapitrainer  Create API traffic to train WAF API gateway. Use -h for options
+cpmetallb     Enables the MicroK8s Metallb with the External IP of the Host system
 "'
 # Kubernetes alias.
 alias k='microk8s.kubectl'
