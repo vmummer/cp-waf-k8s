@@ -14,7 +14,7 @@ echo "Check Point WAF on Kubernetes Lab Alias Commands.  Use cphelp for list of 
 alias k=microk8s.kubectl
 alias kubectl=microk8s.kubectl
 alias helm='/snap/bin/microk8s.helm'
-HOST_`IP="`hostname -I| awk ' {print $1}'`"
+HOST_IP="`hostname -I| awk ' {print $1}'`"
 WAPAPP=cp-appsec-cloudguard-waf-ingress-nginx-controller
 
 if k get pods -A | grep -q -o 'cp-appsec' ; then 
@@ -44,7 +44,7 @@ alias cpcert='sh cp/cp_get_cert.sh'
 alias cpfetch='git  config --global http.sslverify false && git clone https://github.com/vmummer/cp-waf-k8s.git'
 alias cphost='printf " Host IP address used: $HOST_IP \n"'
 alias cpingress='printf "Ingress IP address used: $INGRESS_IP \n"'
-alias cpmetallb='microk8s enable metallb:$HOST_IP-$HOST_IP
+alias cpmetallb='microk8s enable metallb:$HOST_IP-$HOST_IP'
 alias cphelp='printf "Check Point Lab Commands:     Ver: $VER\n
 cpnano        Show detail status of AppSec Agent ( use as cpnano -s)
 cpnanol       Show last update of the AppSec Agent
@@ -56,6 +56,4 @@ cpingress     Shows the IP address of the Ingress Controller used
 cphelp        Alias Command to help with Check Point Lab
 cpapitrainer  Create API traffic to train WAF API gateway. Use -h for options
 cpmetallb     Enables the MicroK8s Metallb with the External IP of the Host system
-"'
-# Kubernetes alias.
-alias k='microk8s.kubectl'
+"' 
