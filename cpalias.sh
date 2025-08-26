@@ -9,12 +9,12 @@
 # Aug 15, 2025 - Added variable $HOST_IP and command cpmetallb 
 if [[ hostname =~ [A-Z] ]]; then  echo ">>> WARNING <<< hostname contains Capital Letters. When using microk8s the capital letters in the hostname will cause many different type of failures. Rename host name to all lower case to continue!"; exit 1; fi
 
-VER=2.2
+VER=2.3
 echo "Check Point WAF on Kubernetes Lab Alias Commands.  Use cphelp for list of commands. Ver: $VER"
 alias k=microk8s.kubectl
 alias kubectl=microk8s.kubectl
 alias helm='/snap/bin/microk8s.helm'
-HOST_IP="`hostname -I| awk ' {print $1}'`"
+export HOST_IP="`hostname -I| awk ' {print $1}'`"
 WAPAPP=cp-appsec-cloudguard-waf-ingress-nginx-controller
 
 if k get pods -A | grep -q -o 'cp-appsec' ; then 
@@ -51,7 +51,7 @@ cpnanol       Show last update of the AppSec Agent
 cpuninstall   Uninstall AppSec Agent
 cpagenttoken  Install AppSec Agent and assign Token
 cptraffic     Juiceshop Traffic Generator
-cphost        Shows the IP address of the Docker Host used
+cphost        Shows the IP address of the Host used
 cpingress     Shows the IP address of the Ingress Controller used
 cphelp        Alias Command to help with Check Point Lab
 cpapitrainer  Create API traffic to train WAF API gateway. Use -h for options
