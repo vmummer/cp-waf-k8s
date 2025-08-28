@@ -59,6 +59,6 @@ cpingress     Shows the IP address of the Ingress Controller used
 cphelp        Alias Command to help with Check Point Lab
 cpapitrainer  Create API traffic to train WAF API gateway. Use -h for options
 cpmetallb     Enables the MicroK8s Metallb with the External IP of the Host system
-couraljuiceshop Fetches Juiceshop Website via Exposed Ingress Controller
-cpurlvampi    Fetches Vampi website via Exposed Ingress Controller
+cpcurljuiceshop Fetches Juiceshop Website via Exposed Ingress Controller
+cpcurlvampi    Fetches Vampi website via Exposed Ingress Controller
 "' 
