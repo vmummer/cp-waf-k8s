@@ -48,6 +48,16 @@ alias cpingress='printf "Ingress IP address used: $INGRESS_IP \n"'
 alias cpmetallb='microk8s enable metallb:$HOST_IP-$INGRESS_IP'
 alias cpcurljuiceshop='curl -s -H "Host: juiceshop.lab"  $INGRESS_IP | head -n 5 ; echo "<Remainder Delete>"'
 alias cpcurlvampi='curl -s -H "Host: vampi.lab" $INGRESS_IP | head -n 5 '
+
+alias cpdnscheck='printf "DNS Values Check\n" && \
+	printf "CoreDNS service ClusterIP: " && \
+	kubectl get svc -n kube-system kube-dns -o=jsonpath="{.spec.clusterIP}" && \
+	printf "\nTesthost Resolv.conf: " && \
+	kubectl exec -it testhost -n testhost -- cat /etc/resolv.conf | grep -oP "nameserver\s*\K[^,]+" | tr -d "\n" &&  \
+	printf "\nValues should match\n"'
+
+
+
 alias cphelp='printf "Check Point Lab Commands:     Ver: $VER\n
 cpnano        Show detail status of AppSec Agent ( use as cpnano -s)
 cpnanol       Show last update of the AppSec Agent
@@ -60,5 +70,6 @@ cphelp        Alias Command to help with Check Point Lab
 cpapitrainer  Create API traffic to train WAF API gateway. Use -h for options
 cpmetallb     Enables the MicroK8s Metallb with the External IP of the Host system
 cpcurljuiceshop Fetches Juiceshop Website via Exposed Ingress Controller
-cpcurlvampi    Fetches Vampi website via Exposed Ingress Controller
+cpcurlvampi   Fetches Vampi website via Exposed Ingress Controller
+cpdnscheck    Show CoreDNS Service IP and Resolve.conf for Testhost    
 "' 
