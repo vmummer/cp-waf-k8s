@@ -23,7 +23,7 @@ VFLAG=0
 REPEAT=1
 #Check to see if DEFAULT_URL_CPAPI URL has been passed.
 #
-if [ -z "${DEFAULT_URL_CPAPI}" ]; then
+if [ -z "${DEFAULT_URL_CPAPI:-}" ]; then
         HOST="http://vampi.lab"
 else
 	HOST=$DEFAULT_URL_CPAPI

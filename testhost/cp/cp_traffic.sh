@@ -12,7 +12,7 @@
 VER=1.0
 #Check to see if DEFAULT_URL_CPTRAFFIC URL has been passed.
 #
-if [ -z "${DEFAULT_URL_CPTRAFFIC}" ]; then
+if [ -z "${DEFAULT_URL_CPTRAFFIC:-}" ]; then
 	echo "IF - Vince" 
 	HOST="http://juiceshop.lab:80"
 else

@@ -52,7 +52,7 @@ alias cpmetallb='microk8s enable metallb:$HOST_IP-$INGRESS_IP'
 alias cpcurljuiceshop='curl -s -H "Host: juiceshop.lab"  $INGRESS_IP | head -n 5 ; echo "<Remainder Delete>"'
 alias cpcurlvampi='curl -s -H "Host: vampi.lab" $INGRESS_IP | head -n 5 '
 alias cpdtraffic='docker run -it -e DEFAULT_URL_CPTRAFFIC=${DEFAULT_URL_CPTRAFFIC} vmummer/cpwaftesthost /home/cp/cp_traffic.sh'
-alias cpdapitrainer='docker run -it -e DEFAAULT_URL_CPAPI=${DEFAULT_URL_API} vmummer/cpwaftesthost bash /home/cp/cpapitrlocal.sh'
+alias cpdapitrainer='docker run -it -e DEFAULT_URL_CPAPI=${DEFAULT_URL_API} vmummer/cpwaftesthost bash /home/cp/cpapitrlocal.sh'
 
 alias cpdnscheck='printf "DNS Values Check\n" && \
 	printf "CoreDNS service ClusterIP: " && \
