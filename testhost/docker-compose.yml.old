@@ -17,7 +17,7 @@ services:
     tty: true
     build:
        dockerfile: Dockerfile
-       context: ./
+       context: ./testhost
     volumes:
       - ./tester/data:/home/web-scraper/data
     hostname: tester

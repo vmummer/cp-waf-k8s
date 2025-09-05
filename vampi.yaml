@@ -5,6 +5,7 @@ metadata:
   labels:
     app: vampi 
   name: vampi 
+  namespace: juiceshop
 spec:
   replicas: 1
   selector:
@@ -33,6 +34,7 @@ metadata:
   labels:
     app: vampi 
   name: vampi 
+  namespace: juiceshop
 spec:
   ports:
   - name: vampi 

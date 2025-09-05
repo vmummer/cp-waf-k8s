@@ -1,23 +1,19 @@
+# 25-09 - Added passing default hosts to container
 apiVersion: v1
 kind: Pod
 metadata:
   name: testhost 
+  namespace: testhost
 spec:
   containers:
   - name: waf-k8s-testhost 
-#  image: localhost:32000/testhost:current
     image: vmummer/cpwaftesthost:latest
-#    imagePullPolicy: Never  
-#    imagePullPolicy: IfNotPresent
     imagePullPolicy: Always
 #
+    env:
+    - name: DEFAULT_URL_CPTRAFFIC
+      value: http://juiceshop.lab
+    - name: DEFAULT_URL_CPAPI
+      value: http://vampi.lab
     command: ["/bin/sh", "-ec", "while :; do echo '.'; sleep 5 ; done"]
-#    volumeMounts:
-#      - mountPath: /home/cp
-#        name: cp-files
 
-#  volumes:
-#  - name: cp-files
-#    hostPath:
-#      path: /home/lab/cp-waf-k8s/cp 
-#      type: Directory

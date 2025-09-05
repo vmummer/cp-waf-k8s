@@ -5,10 +5,20 @@
 # The following script was created to train the WAF used to protect Juiceshop Webstore
 # Written by Vince Mammoliti - vincem@checkpoint.com
 # Version 0.1 - July 17, 2025 - Newly created joint
-
+# Version 1.0 - September 5, 2025 - Added the functionality of passing URL HOST from host system
+#               Added DEFAULT_URL_CPTRAFFIC 
 
 # Default values
-HOST="http://juiceshop.lab:80"
+VER=1.0
+#Check to see if DEFAULT_URL_CPTRAFFIC URL has been passed.
+#
+if [ -z "${DEFAULT_URL_CPTRAFFIC}" ]; then
+	echo "IF - Vince" 
+	HOST="http://juiceshop.lab:80"
+else
+	HOST=$DEFAULT_URL_CPTRAFFIC
+	echo "ELSE" 
+fi
 REPEAT=1
 MODE="good"
 DELAY=1
@@ -21,7 +31,7 @@ NC='\033[0m' # No Color
 usage() {
 >&2 cat << EOF
 $0 is a test tool to demostrate Check Point WAF offering
-Written by Vince Mammoliti - vincem@checkpoint.com - July 2025
+Written by Vince Mammoliti - vincem@checkpoint.com - Sept 2025
 
 Usage: $0 [-m ] [-R] [URL] [-r repeat] [-d delay]
     
@@ -157,7 +167,7 @@ done
 shift $((OPTIND -1))
 
 echo -e "$0 is a test tool to demostrate Check Point WAF offering
-Written by Vince Mammoliti - vincem@checkpoint.com - July 2025 (-h) for usage \n"
+Written by Vince Mammoliti - vincem@checkpoint.com - Sept 2025 (-h) for usage \n"
 
 
 # Positional argument for URL

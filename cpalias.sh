@@ -8,10 +8,12 @@
 # Aug 20, 2025 - Added check to see if cp-appsec was enabled before trying to get variables.
 # Aug 15, 2025 - Added variable $HOST_IP and command cpmetallb 
 # Aug 28, 2025 - Added cpcurljuiceshop & cpcurlvampi 
-# Sept 5, 2025 - Added to run just the TestHost in Docker Container
+# Sept 5, 2025 - Added to run just the TestHost in Docker Container and passing DEFAULT URL
 if [[ hostname =~ [A-Z] ]]; then  echo ">>> WARNING <<< hostname contains Capital Letters. When using microk8s the capital letters in the hostname will cause many different type of failures. Rename host name to all lower case to continue!"; exit 1; fi
 
-VER=2.4
+VER=2.5
+export DEFAULT_URL_CPTRAFFIC="http://juiceshop.lab"
+export DEFAULT_URL_CPAPI="http://vampi.lab"
 echo "Check Point WAF on Kubernetes Lab Alias Commands.  Use cphelp for list of commands. Ver: $VER"
 alias k=microk8s.kubectl
 alias kubectl=microk8s.kubectl
@@ -49,8 +51,8 @@ alias cpingress='printf "Ingress IP address used: $INGRESS_IP \n"'
 alias cpmetallb='microk8s enable metallb:$HOST_IP-$INGRESS_IP'
 alias cpcurljuiceshop='curl -s -H "Host: juiceshop.lab"  $INGRESS_IP | head -n 5 ; echo "<Remainder Delete>"'
 alias cpcurlvampi='curl -s -H "Host: vampi.lab" $INGRESS_IP | head -n 5 '
-alias cpdtraffic='docker run -it vmummer/cpwaftesthost /home/cp/cp_traffic.sh'
-alias cpdapitrainer='docker run -it vmummer/cpwaftesthost bash /home/cp/cpapitrlocal.sh'
+alias cpdtraffic='docker run -it -e DEFAULT_URL_CPTRAFFIC=${DEFAULT_URL_CPTRAFFIC} vmummer/cpwaftesthost /home/cp/cp_traffic.sh'
+alias cpdapitrainer='docker run -it -e DEFAAULT_URL_CPAPI=${DEFAULT_URL_API} vmummer/cpwaftesthost bash /home/cp/cpapitrlocal.sh'
 
 alias cpdnscheck='printf "DNS Values Check\n" && \
 	printf "CoreDNS service ClusterIP: " && \
