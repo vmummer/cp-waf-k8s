@@ -48,8 +48,8 @@ Usage: $0 [OPTIONS...] [URL of VAMPI host - defaults to $HOST]
   -v | --verbose             provides details of commands excuited against host  
   -m | --malicious           send malicious type traffic (Default will be know good training traffic)
   -r | --repeat              repeat the number of times to send api training requests. defaults to 1 
-  -s | --sql		     uses sqlmap to attempt to dump database
-  -u | --sqlupdate	     update sqlmap  
+  -s | --sql		             uses sqlmap to attempt to dump database
+  -u | --sqlupdate	         update sqlmap  
   -i | --initdb              initialize Vampi Database
   -h | --help                this help screen is displayed
 EOF
@@ -116,8 +116,7 @@ if ! [ -x "$(command -v sqlmap)" ]; then
 fi
 
 sqlmap --update
-
-                                                                                                                        exit 0
+exit 0
 }
 
 
