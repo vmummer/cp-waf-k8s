@@ -9,7 +9,7 @@
 # Version 0.7  - Dec  10, 2024 - Modified to support microK8s 
 # Version 0.8  - May   1, 2025 - Added sqlmap --update functionality 
 # Version 0.9  - July  8, 2025 - Added check for symbolic link for /usr/bin/python 
-#
+# Version 1.0  - Sept  5, 2025 - Added passing of System VAR of DEFAULT_URL_CPAPI
 
 set -euo pipefail
 
@@ -18,10 +18,17 @@ function silentResponse () {
        	:
 }
 
-VERS=0.9
+VERS=1.0
 VFLAG=0
 REPEAT=1
-HOST="http://vampi.lab"
+#Check to see if DEFAULT_URL_CPAPI URL has been passed.
+#
+if [ -z "${DEFAULT_URL_CPAPI:-}" ]; then
+        HOST="http://vampi.lab"
+else
+	HOST=$DEFAULT_URL_CPAPI
+fi
+
 DOCKER_HOST="`hostname -I| awk ' {print $1}'`"
 LINE=10
 CHAR=$(( 80 * $LINE))
@@ -35,14 +42,14 @@ SUPDATE=0
 usage(){
 >&2 cat << EOF
 $0 is an API training tool to demonstrate the API learning capability of the Check Point Cloud Guard WAF
-Written by Vince Mammoliti - vincem@checkpoint.com -  July 2025 
+Written by Vince Mammoliti - vincem@checkpoint.com -  Sept 2025 
 
 Usage: $0 [OPTIONS...] [URL of VAMPI host - defaults to $HOST] 
   -v | --verbose             provides details of commands excuited against host  
   -m | --malicious           send malicious type traffic (Default will be know good training traffic)
   -r | --repeat              repeat the number of times to send api training requests. defaults to 1 
-  -s | --sql		     uses sqlmap to attempt to dump database
-  -u | --sqlupdate	     update sqlmap  
+  -s | --sql		             uses sqlmap to attempt to dump database
+  -u | --sqlupdate	         update sqlmap  
   -i | --initdb              initialize Vampi Database
   -h | --help                this help screen is displayed
 EOF
@@ -109,8 +116,7 @@ if ! [ -x "$(command -v sqlmap)" ]; then
 fi
 
 sqlmap --update
-
-                                                                                                                        exit 0
+exit 0
 }
 
 

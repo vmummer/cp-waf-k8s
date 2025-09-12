@@ -9,9 +9,10 @@
 # Aug 15, 2025 - Added variable $HOST_IP and command cpmetallb 
 # Aug 28, 2025 - Added cpcurljuiceshop & cpcurlvampi 
 # Sept 5, 2025 - Added to run just the TestHost in Docker Container and passing DEFAULT URL
+# Sept 11, 2025 - Added Aliases for cpwafciser 
 if [[ hostname =~ [A-Z] ]]; then  echo ">>> WARNING <<< hostname contains Capital Letters. When using microk8s the capital letters in the hostname will cause many different type of failures. Rename host name to all lower case to continue!"; exit 1; fi
 
-VER=2.5
+VER=2.6
 export DEFAULT_URL_CPTRAFFIC="http://juiceshop.lab"
 export DEFAULT_URL_CPAPI="http://vampi.lab"
 echo "Check Point WAF on Kubernetes Lab Alias Commands.  Use cphelp for list of commands. Ver: $VER"
@@ -29,7 +30,9 @@ if k get pods -A | grep -q -o 'cp-appsec' ; then
 fi
 
 #alias cptrbad='_cptrbad() { echo "Dec 2024  - Adapted for K8S Lab" ; url=$1 ;k exec -it  testhost  -n testhost -- bash -c "url=$url && cd /home/juice-shop-solver && python main.py $url";}; _cptrbad'
+alias cpwafciser='k exec -it testhost -n testhost -- bash /home/cp/cpwafciser.sh'
 alias cptraffic='k exec -it testhost -n testhost -- bash /home/cp/cp_traffic.sh'
+alias cpwafciser='k exec -it testhost -n testhost -- bash /home/cp/cpwafciser.sh'
 alias cpapi='bash cp/cp_api_trainer.sh'
 alias cpapitrainer='k exec -it testhost -n testhost -- bash /home/cp/cpapitrlocal.sh'
 alias cptesthost='k exec -it testhost -n testhost -- bash'
@@ -63,7 +66,8 @@ alias cpdnscheck='printf "DNS Values Check\n" && \
 
 
 
-alias cphelp='printf "Check Point Lab Commands:     Ver: $VER\n
+alias cphelp='printf "Check Point Lab Commands:     Ver: $VER
+written by - Vince Mammoliti - vincem@checkpoint.com \n
 cpnano        Show detail status of AppSec Agent ( use as cpnano -s)
 cpnanol       Show last update of the AppSec Agent
 cpuninstall   Uninstall AppSec Agent
@@ -79,4 +83,5 @@ cpcurlvampi   Fetches Vampi website via Exposed Ingress Controller
 cpdnscheck    Show CoreDNS Service IP and Resolve.conf for Testhost    
 cpdtraffic    Docker Based Testhost of cptraffic
 cpdapitrainer Docker Based Testhost of cpapitrainer
+cpwafciser    Combined tool for Exercising WAF and API hosts. user -h for usage and options
 "' 
