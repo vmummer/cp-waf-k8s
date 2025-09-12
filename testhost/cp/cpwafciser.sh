@@ -7,7 +7,7 @@ set -euo pipefail
 # 
 
 # Script metadata
-VERSION="1.0.0"
+VERSION="1.0.1"
 SCRIPT_NAME=$(basename "$0")
 CURL_TIMEOUT=30
 
@@ -319,9 +319,9 @@ sql_vampi() {
     echo "sqlmap is not installed - please install 'apt-get install sqlmap'" >&2
     exit 1
   fi
-  echo "Running SQL injection test on ${HOST_API}"
+  echo "Running SQL injection test on ${HOST}"
   gettoken
-  sqlmap -u "${HOST_API}/users/v1/*name1*" \
+  sqlmap -u "${HOST}/users/v1/*name1*" \
          --method=GET \
          --headers="Accept: application/json\nAuthorization: Bearer $TOKEN" \
          --dbms=sqlite --dump --batch
