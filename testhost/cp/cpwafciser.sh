@@ -414,14 +414,13 @@ while [[ $# -gt 0 ]]; do
     *)
   #    echo "Unknown option: ${1:-}" >&2
 #      usage
-
       # Positional argument for URL
       if [ $# -gt 0 ] && [ -n "${1:-}" ]; then
         if [[ "${1:-}" != http* ]]; then
         echo -e "${RED}ERROR: URL must start with http:// or https://${NC}"
         exit 2 
-      fi
-      HOST="$1"
+        fi
+      HOST=${1} 
       fi
       shift
 
@@ -438,14 +437,17 @@ set_verbose
 if [[ "$APP" == "web" ]]; then
 #Check to see if DEFAULT_URL_CPTRAFFIC URL has been passed.
 #
-if [ -z "${DEFAULT_URL_CPTRAFFIC:-}" ]; then
+##if [ -z "${DEFAULT_URL_CPTRAFFIC:-}" ]; then
    if [ -z "${HOST:-}" ]; then
    	HOST=${HOST_WEB}
     fi
-else
-	HOST=${DEFAULT_URL_CPTRAFFIC}
-fi
-	
+#else
+#	HOST=${DEFAULT_URL_CPTRAFFIC}
+#fi
+
+
+
+
   case "$MODE" in
     good) traffic_good_juiceshop ;;
     malicious) traffic_malicious_juiceshop ;;
@@ -456,13 +458,13 @@ elif [[ "$APP" == "api" ]]; then
 
 #Check to see if DEFAULT_URL_CPAPI URL has been passed.
 #
-if [ -z "${DEFAULT_URL_CPAPI:-}" ]; then
-   if [ -z "${HOST:-}"]; then
+#if [ -z "${DEFAULT_URL_CPAPI:-}" ]; then
+   if [ -z "${HOST:-}" ]; then
    	HOST=${HOST_API}
     fi
-else
-HOST=${DEFAULT_URL_CPAPI}
-fi
+#else
+#HOST=${DEFAULT_URL_CPAPI}
+#fi
   if (( INITDB )); then initdb_vampi; fi
   if (( SQL )); then sql_vampi; fi
   if (( SQLUPDATE )); then sqlupdate_vampi; fi
