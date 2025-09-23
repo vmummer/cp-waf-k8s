@@ -2,11 +2,11 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: testhost 
-  namespace: testhost
+  name: wafciser 
+  namespace: wafciser
 spec:
   containers:
-  - name: waf-k8s-testhost 
+  - name: cp-wapciser 
     #    image: vmummer/cpwaftesthost:latest.rfhardened
     image: vmummer/cpwafciser:latest
     imagePullPolicy: Always

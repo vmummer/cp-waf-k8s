@@ -7,9 +7,10 @@ set -euo pipefail
 # 
 
 # Script metadata
-VERSION="1.0.0"
+VERSION="1.0.2"
 SCRIPT_NAME=$(basename "$0")
 CURL_TIMEOUT=30
+CURL_CONNECTTIMEOUT=10
 
 # Color setup
 RED='\033[0;31m'
@@ -29,7 +30,7 @@ INITDB=0
 SQL=0
 SQLUPDATE=0
 LINE=10
-CHAR=$(( 80 * ${LINE}))
+CHAR=$((80 * LINE))
 
 # Check for environment variables or use defaults
 HOST_WEB="${DEFAULT_URL_CPTRAFFIC:-http://juiceshop.lab:80}"
@@ -87,6 +88,18 @@ EOF
     exit 0
 }
 
+
+# Curl with timeouts.
+curl_to() {
+   curl --connect-timeout "$CURL_TIMEOUT" \
+         --max-time "$CURL_CONNECTTIMEOUT" \
+         "$@"
+    return 0
+}
+
+ 
+
+
 # Utility: HTTP status code description 
 get_http_status_description() {
   case "$1" in
@@ -135,7 +148,7 @@ ratelimit_traffic() {
     echo "Request #$i at $(date +%T)"
     
     # Execute curl and capture both the HTTP code and total time
-    CURL_OUTPUT=$(curl -s -o /dev/null -w "%{http_code}|||%{time_total}" "$HOST")
+    CURL_OUTPUT=$(curl_to -s -o /dev/null -w "%{http_code}|||%{time_total}" "$HOST")
     
     # Extract the http_code and time_total
     HTTP_CODE=$(echo "$CURL_OUTPUT" | cut -d'|' -f1)
@@ -159,11 +172,27 @@ ratelimit_traffic() {
 # VAMPI traffic and API training
 # Helper function to get token
 gettoken() {
-  TOKEN=$(curl -sS -X POST "${HOST_API}/users/v1/login" \
+  OUTPUT=$(curl_to -sS -X POST "${HOST}/users/v1/login" \
           -H 'accept: application/json' \
           -H 'Content-Type: application/json' \
           -d '{ "password": "pass1", "username": "admin" }' \
-          | jq -r '.auth_token')
+  )
+#          | jq -r '.auth_token')
+ $vResponse -e ${OUTPUT:0:$CHAR} "\n"
+
+# Parse the response with jq and store token
+    if ! TOKEN=$(echo "$OUTPUT" | jq -r '.auth_token'); then
+        echo -e "${RED}Failed to parse auth_token from response${NC}" >&2
+        return 1
+    fi
+    
+    # Verify token isn't null or empty
+    if [[ -z "$TOKEN" || "$TOKEN" == "null" ]]; then
+        echo -e "${RED}No valid auth_token in response${NC}" >&2
+        return 1
+    fi
+
+
   return 0
 }
 
@@ -178,9 +207,9 @@ initdb_vampi() {
  
   hostcheck
   echo -e "Initializing VAMPI DB\n"
-  OUTPUT=$(curl -sS -H 'accept: application/json' -X 'GET' "${HOST}/users/v1")
+  OUTPUT=$(curl_to -sS -H 'accept: application/json' -X 'GET' "${HOST}/users/v1")
   if echo "$OUTPUT" | grep -q -o 'no such table: users'; then
-    OUTPUT=$(curl -sS -H 'accept: application/json' -X 'GET' "${HOST}/createdb")
+    OUTPUT=$(curl_to -sS -H 'accept: application/json' -X 'GET' "${HOST}/createdb")
     if echo "$OUTPUT" | grep -q -o -P '.{0,20}Application Security.{0,4}'; then
       echo -e "${RED}Check Point - Application Security Blocked ${NC}"
       echo -e "Reexecute the command directly to the non protected host URL"
@@ -195,7 +224,7 @@ initdb_vampi() {
 
 checkdb() {
   echo -e "Checking VAMPI DB has been initialized on ${HOST}\n"
-  OUTPUT=$(curl -sS -H 'accept: application/json' -X 'GET' "${HOST}/users/v1")
+  OUTPUT=$(curl_to -sS -H 'accept: application/json' -X 'GET' "${HOST}/users/v1")
   if echo "$OUTPUT" | grep -q -o 'no such table: users'; then
     echo -e "${RED}VAMPI DB has NOT been Initialized - Please Initialize to Continue. Use --initdb option to initialize the VAMPI DB.${NC}"
     exit 1
@@ -204,13 +233,13 @@ checkdb() {
 
 
 hostcheck() {
-  echo -e "$0 - WAFciser is a unified WAF Test & Training Tool - by Vince Mammoliti - vincem@checkpoint.com - Check Point Software 2025 (-h) for usage \n
+  echo -e "WAFciser v$VERSION is a unified WAF Test & Training Tool - by Vince Mammoliti - vincem@checkpoint.com \n - Check Point Software 2025 (-h) for usage \n
 "
-  stripped_host="${HOST#http://}"
+  local stripped_host="${HOST#http://}"
   stripped_host="${stripped_host#https://}"
   stripped_host="${stripped_host%%:*}"
 
-  if getent hosts "$stripped_host" > /dev/null; then
+  if timeout 5 getent hosts "$stripped_host" > /dev/null; then
     echo "✅ Hostname '$stripped_host' resolved successfully."
   else
     echo -e "${RED}❌ Hostname '$stripped_host' could not be resolved.${NC}"
@@ -227,26 +256,44 @@ traffic_good_vampi() {
     loop=$((i + 1))
     echo "Loop: $loop"
     echo "1) GET /"
-    OUTPUT=$(curl -sS -H 'accept: application/json' -X 'GET' "${HOST}/")
+    OUTPUT=$(curl_to -sS -H 'accept: application/json' -X 'GET' "${HOST}/")
+    ifblocked
+    $vResponse -e ${OUTPUT:0:$CHAR} "\n"
+
 
     echo "2) GET /books/v1"
-    OUTPUT=$(curl -sS -H 'accept: application/json' -X 'GET' "${HOST}/books/v1")
+    OUTPUT=$(curl_to -sS -H 'accept: application/json' -X 'GET' "${HOST}/books/v1")
+    ifblocked
+    $vResponse -e ${OUTPUT:0:$CHAR} "\n"
+
 
     echo "3) GET /users/v1"
-    OUTPUT=$(curl -sS -H 'accept: application/json' -X 'GET' "${HOST}/users/v1")
+    OUTPUT=$(curl_to -sS -H 'accept: application/json' -X 'GET' "${HOST}/users/v1")
+    ifblocked
+    $vResponse -e ${OUTPUT:0:$CHAR} "\n"
+
 
     echo "4) POST /user/v1/login"
-    TOKEN=$(curl -sS -X POST "${HOST}/users/v1/login" \
+    TOKEN=$(curl_to -sS -X POST "${HOST}/users/v1/login" \
             -H 'accept: application/json' \
             -H 'Content-Type: application/json' \
             -d '{ "password": "pass1", "username": "name1" }' \
             | jq -r '.auth_token')
 
+    OUTPUT=${TOKEN}        
+    ifblocked
+    $vResponse -e ${OUTPUT:0:$CHAR} "\n"
+
+
     echo "5) GET /users/v1/admin"
-    OUTPUT=$(curl -sS -H 'accept: application/json' -X 'GET' "${HOST}/users/v1/admin")
+    OUTPUT=$(curl_to -sS -H 'accept: application/json' -X 'GET' "${HOST}/users/v1/admin")
+
+    ifblocked
+    $vResponse -e ${OUTPUT:0:$CHAR} "\n"
+
 
     echo "6) POST /books/v1 - new book added"
-    OUTPUT=$(curl -sS -X 'POST' "${HOST}/books/v1" \
+    OUTPUT=$(curl_to -sS -X 'POST' "${HOST}/books/v1" \
             -H 'accept: application/json' \
             -H 'Content-Type: application/json' \
             -H "Authorization: Bearer $TOKEN" \
@@ -255,10 +302,18 @@ traffic_good_vampi() {
               "secret": "cp-secret"
             }')
 
+    ifblocked
+    $vResponse -e ${OUTPUT:0:$CHAR} "\n"
+
+
     echo "7) GET /books/v1/cp-GCWAF-102 - book details"
-    OUTPUT=$(curl -sS -X GET "${HOST}/books/v1/cp-GCWAF-102" \
+    OUTPUT=$(curl_to -sS -X GET "${HOST}/books/v1/cp-GCWAF-102" \
             -H 'accept: application/json' \
             -H "Authorization: Bearer $TOKEN")
+
+    ifblocked
+    $vResponse -e ${OUTPUT:0:$CHAR} "\n"
+
 
     sleep "$DELAY"
   done
@@ -275,21 +330,21 @@ traffic_malicious_vampi() {
     gettoken
  # Create a Bad Book Lookup
     echo "1) Send a bad book lookup - sending /books/v1/cp-GCWAF-102x"
-    OUTPUT=$(curl -sS -X GET "${HOST_API}/books/v1/cp-GCWAF-102x" \
+    OUTPUT=$(curl_to -sS -X GET "${HOST_API}/books/v1/cp-GCWAF-102x" \
             -H 'accept: application/json' \
             -H "Authorization: Bearer $TOKEN")
     ifblocked
     $vResponse -e ${OUTPUT:0:$CHAR} "\n"
 
     echo "2) Send an attempt to exploit account - send /users/v1/user1'"
-    OUTPUT=$(curl -sS -X GET "${HOST_API}/users/v1/user1'" \
+    OUTPUT=$(curl_to -sS -X GET "${HOST_API}/users/v1/user1'" \
             -H 'Content-Type: application/json' \
             -H "Authorization: Bearer $TOKEN")
     ifblocked
     $vResponse -e ${OUTPUT:0:$CHAR} "\n"
    
     echo "3) Send an attempt to exploit developer testing tool - send /users/v1/_debug"
-    OUTPUT=$(curl -sS -X GET "${HOST_API}/users/v1/_debug" \
+    OUTPUT=$(curl_to -sS -X GET "${HOST_API}/users/v1/_debug" \
             -H 'Content-Type: application/json' \
             -H "Authorization: Bearer $TOKEN")
     ifblocked
@@ -297,14 +352,14 @@ traffic_malicious_vampi() {
     
     
     echo "4) DELETE /users/v1/cgwaf2 "
-    OUTPUT=$(curl -sS -X DELETE   ${HOST}/users/v1/cgwaf2  -H 'Content-Type: application/json' \
+    OUTPUT=$(curl_to -sS -X DELETE   ${HOST}/users/v1/cgwaf2  -H 'Content-Type: application/json' \
          -H "Authorization: Bearer $TOKEN"
            )
     ifblocked
     $vResponse $OUTPUT
     
     echo "5) /ui "
-    OUTPUT=$(curl -sS ${HOST}/ui)
+    OUTPUT=$(curl_to -sS ${HOST}/ui)
     ifblocked
     $vResponse $OUTPUT
     
@@ -319,9 +374,9 @@ sql_vampi() {
     echo "sqlmap is not installed - please install 'apt-get install sqlmap'" >&2
     exit 1
   fi
-  echo "Running SQL injection test on ${HOST_API}"
+  echo "Running SQL injection test on ${HOST}"
   gettoken
-  sqlmap -u "${HOST_API}/users/v1/*name1*" \
+  sqlmap -u "${HOST}/users/v1/*name1*" \
          --method=GET \
          --headers="Accept: application/json\nAuthorization: Bearer $TOKEN" \
          --dbms=sqlite --dump --batch
@@ -339,6 +394,13 @@ sqlupdate_vampi() {
   exit 1
 }
 
+# Standardize error exits
+die() {
+    echo -e "${RED}Error: $*${NC}" >&2
+    exit 1
+}
+
+
 # Check if no arguments provided
 if [[ $# -eq 0 ]]; then
 #    usage
@@ -348,7 +410,8 @@ fi
 
 # Argument parsing
 while [[ $# -gt 0 ]]; do
-    case "${1:-}" in
+  key="$1"
+    case $key in
         -a|--app)
             if [[ -n "${2:-}" ]]; then
                 APP="$2"
@@ -414,14 +477,13 @@ while [[ $# -gt 0 ]]; do
     *)
   #    echo "Unknown option: ${1:-}" >&2
 #      usage
-
       # Positional argument for URL
       if [ $# -gt 0 ] && [ -n "${1:-}" ]; then
         if [[ "${1:-}" != http* ]]; then
         echo -e "${RED}ERROR: URL must start with http:// or https://${NC}"
         exit 2 
-      fi
-      HOST="$1"
+        fi
+      HOST=${1} 
       fi
       shift
 
@@ -438,14 +500,17 @@ set_verbose
 if [[ "$APP" == "web" ]]; then
 #Check to see if DEFAULT_URL_CPTRAFFIC URL has been passed.
 #
-if [ -z "${DEFAULT_URL_CPTRAFFIC:-}" ]; then
+##if [ -z "${DEFAULT_URL_CPTRAFFIC:-}" ]; then
    if [ -z "${HOST:-}" ]; then
    	HOST=${HOST_WEB}
     fi
-else
-	HOST=${DEFAULT_URL_CPTRAFFIC}
-fi
-	
+#else
+#	HOST=${DEFAULT_URL_CPTRAFFIC}
+#fi
+
+
+
+
   case "$MODE" in
     good) traffic_good_juiceshop ;;
     malicious) traffic_malicious_juiceshop ;;
@@ -456,13 +521,13 @@ elif [[ "$APP" == "api" ]]; then
 
 #Check to see if DEFAULT_URL_CPAPI URL has been passed.
 #
-if [ -z "${DEFAULT_URL_CPAPI:-}" ]; then
-   if [ -z "${HOST:-}"]; then
+#if [ -z "${DEFAULT_URL_CPAPI:-}" ]; then
+   if [ -z "${HOST:-}" ]; then
    	HOST=${HOST_API}
     fi
-else
-HOST=${DEFAULT_URL_CPAPI}
-fi
+#else
+#HOST=${DEFAULT_URL_CPAPI}
+#fi
   if (( INITDB )); then initdb_vampi; fi
   if (( SQL )); then sql_vampi; fi
   if (( SQLUPDATE )); then sqlupdate_vampi; fi
