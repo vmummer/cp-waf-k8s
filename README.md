@@ -9,7 +9,7 @@ The repository also includes a Client Host Pod used to generations web traffic, 
 
 <img width="1239" height="796" alt="image" src="https://github.com/user-attachments/assets/4a554cd0-5add-4821-8f8a-e07f9c4fdcf2" />
 
-
+```
 Instructions:
  
 * Clone the repository
@@ -43,7 +43,7 @@ cpmetallb
 
 k apply -f namespace.yaml
 
-* From the Check Point Infinity Portal - Create a WAF assset
+* From the Check Point Infinity Portal - Create a WAF asset
 * Fetch the Cloud Guard Helm Chart
 
 wget https://cloudguard-waf.i2.checkpoint.com/downloads/helm/ingress-nginx/cp-k8s-appsec-nginx-ingress-4.12.1.tgz -O cp-k8s-appsec-nginx-ingress-4.12.1.tgz
@@ -54,7 +54,7 @@ helm install cp-k8s-appsec-nginx-ingress-4.12.1.tgz --name-template cp-appsec \
 --set appsec.agentToken="cp-us-<Removed>"    << Replace with your own key
 
 
-```
+
 [DEMO HERE]
 
 cphelp     - Will show alias command useful for this demo
