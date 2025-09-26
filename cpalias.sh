@@ -12,9 +12,10 @@
 # Sept 11, 2025 - Added Aliases for cpwafciser 
 # Sept 12  2025 - Fixed Metallb command
 # Sept 22, 2025 - Moved to namespace - webapps (juiceshop and Vampi) - wafciser (wafciser)
+# Sept 26, 2025 - Add cpuptemp alias command to create the coredns.yaml file
 if [[ hostname =~ [A-Z] ]]; then  echo ">>> WARNING <<< hostname contains Capital Letters. When using microk8s the capital letters in the hostname will cause many different type of failures. Rename host name to all lower case to continue!"; exit 1; fi
 
-VER=3.0
+VER=3.2
 export DEFAULT_URL_CPTRAFFIC="http://juiceshop.lab"
 export DEFAULT_URL_CPAPI="http://vampi.lab"
 echo "Check Point WAF on Kubernetes Lab Alias Commands.  Use cphelp for list of commands. Ver: $VER"
@@ -22,6 +23,7 @@ alias k=microk8s.kubectl
 alias kubectl=microk8s.kubectl
 alias ka="kubectl apply"
 alias kd="kubectl delete"
+alias kp="kubectl get pods -A"
 alias helm='/snap/bin/microk8s.helm'
 export HOST_IP="`hostname -I| awk ' {print $1}'`"
 WAPAPP=cp-appsec-cloudguard-waf-ingress-nginx-controller
@@ -35,9 +37,10 @@ fi
 
 #alias cptrbad='_cptrbad() { echo "Dec 2024  - Adapted for K8S Lab" ; url=$1 ;k exec -it  testhost  -n testhost -- bash -c "url=$url && cd /home/juice-shop-solver && python main.py $url";}; _cptrbad'
 alias cpwafciser='k exec -it wafciser -n wafciser -- bash /home/cp/cpwafciser.sh'
+alias wafciser='cpwafciser'
 alias cptraffic='k exec -it wafciser -n wafciser -- bash /home/cp/cp_traffic.sh'
 alias cpapitrainer='k exec -it wafciser -n wafciser -- bash /home/cp/cpapitrlocal.sh'
-alias cptesthost='k exec -it wafciser  -n wafciser -- bash'
+alias wafciserhost='k exec -it wafciser  -n wafciser -- bash'
 alias cpsqlmapupdate='k exec -it wafciser -n wafciser -- sqlmap --update'
 alias cpnano='get_WAFPOD && k exec -it $WAFPOD -- cpnano'
 alias cpnanoc='get_WAFPOD && k exec -it $WAFPOD -- bash'
@@ -54,13 +57,20 @@ alias cpingress='printf "Ingress IP address used: $INGRESS_IP \n"'
 alias cpmetallb='microk8s enable metallb:$INGRESS_IP-$INGRESS_IP'
 alias cpcurljuiceshop='curl -s -H "Host: juiceshop.lab"  $INGRESS_IP | head -n 5 ; echo "<Remainder Delete>"'
 alias cpcurlvampi='curl -s -H "Host: vampi.lab" $INGRESS_IP | head -n 5 '
+alias cpuptemp='echo "Updating coredns.yaml using coredns.yaml.template with local Host IP address of ${HOST_IP}" && \
+	         envsubst  < coredns.yaml.template > coredns.yaml '
 
 alias cpdnscheck='printf "DNS Values Check\n" && \
 	printf "CoreDNS service ClusterIP: " && \
 	kubectl get svc -n kube-system kube-dns -o=jsonpath="{.spec.clusterIP}" && \
 	printf "\nTesthost Resolv.conf: " && \
-	kubectl exec -it testhost -n testhost -- cat /etc/resolv.conf | grep -oP "nameserver\s*\K[^,]+" | tr -d "\n" &&  \
-	printf "\nValues should match\n"'
+	kubectl exec -it wafciser -n wafciser -- cat /etc/resolv.conf | grep -oP "nameserver\s*\K[^,]+" | tr -d "\n" &&  \
+	printf "\nValues should match\n" && \
+	printf "\nHost IP: ${HOST_IP}  Ingress IP: ${INGRESS_IP}"
+	printf "\nChecking the WAFciser containers DNS for juiceshop.lab and vampi.lab \n" && \
+	k exec -it wafciser -n wafciser -- getent hosts juiceshop.lab && \
+	k exec -it wafciser -n wafciser -- getent hosts vampi.lab && \
+	printf "The hosts IP resolution should match the Host or Ingress IP\n"'
 
 
 
@@ -79,7 +89,8 @@ cpmetallb        Enables the MicroK8s Metallb with the External IP of the Host s
 cpcurljuiceshop  Fetches Juiceshop Website via Exposed Ingress Controller
 cpcurlvampi      Fetches Vampi website via Exposed Ingress Controller
 cpdnscheck       Show CoreDNS Service IP and Resolve.conf for Testhost    
-cpwafciser       Combined tool for Exercising WAF and API hosts. user -h for usage and options
+cpuptemp         Update the local yaml files using templates and update with local IPs (coredns.yaml)
+wafciser         WAF - WEB and API Exerciser (Juiceshop and Vampi). user -h for usage and options
 "' 
 # remote cpdtraffic and cpdapitrainer too confusing
 # cpdtraffic    Docker Based Testhost of cptraffic

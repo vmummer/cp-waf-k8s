@@ -4,10 +4,11 @@ set -euo pipefail
 # Created to be used against Juice Shop and VAMPI applications 
 # Written by Vince Mammoliti - vincem@checkpoint.com
 # 25 Sept 08-  Combined of a few applicaiton into single for simplicity
+# 25 Sept 23 - Removed HOST_API definition in vampi malicious
 # 
 
 # Script metadata
-VERSION="1.0.2"
+VERSION="1.0.3"
 SCRIPT_NAME=$(basename "$0")
 CURL_TIMEOUT=30
 CURL_CONNECTTIMEOUT=10
@@ -330,21 +331,21 @@ traffic_malicious_vampi() {
     gettoken
  # Create a Bad Book Lookup
     echo "1) Send a bad book lookup - sending /books/v1/cp-GCWAF-102x"
-    OUTPUT=$(curl_to -sS -X GET "${HOST_API}/books/v1/cp-GCWAF-102x" \
+    OUTPUT=$(curl_to -sS -X GET "${HOST}/books/v1/cp-GCWAF-102x" \
             -H 'accept: application/json' \
             -H "Authorization: Bearer $TOKEN")
     ifblocked
     $vResponse -e ${OUTPUT:0:$CHAR} "\n"
 
     echo "2) Send an attempt to exploit account - send /users/v1/user1'"
-    OUTPUT=$(curl_to -sS -X GET "${HOST_API}/users/v1/user1'" \
+    OUTPUT=$(curl_to -sS -X GET "${HOST}/users/v1/user1'" \
             -H 'Content-Type: application/json' \
             -H "Authorization: Bearer $TOKEN")
     ifblocked
     $vResponse -e ${OUTPUT:0:$CHAR} "\n"
    
     echo "3) Send an attempt to exploit developer testing tool - send /users/v1/_debug"
-    OUTPUT=$(curl_to -sS -X GET "${HOST_API}/users/v1/_debug" \
+    OUTPUT=$(curl_to -sS -X GET "${HOST}/users/v1/_debug" \
             -H 'Content-Type: application/json' \
             -H "Authorization: Bearer $TOKEN")
     ifblocked
@@ -368,7 +369,6 @@ traffic_malicious_vampi() {
 }
 
 sql_vampi() {
-#  HOST=${HOST_API}
   hostcheck
   if ! [ -x "$(command -v sqlmap)" ]; then
     echo "sqlmap is not installed - please install 'apt-get install sqlmap'" >&2
@@ -404,7 +404,7 @@ die() {
 # Check if no arguments provided
 if [[ $# -eq 0 ]]; then
 #    usage
-echo " skip" 
+echo " Using Default Settings - Web Application - Good Traffic" 
 fi
 
 
