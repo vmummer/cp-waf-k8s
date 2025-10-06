@@ -15,7 +15,7 @@
 # Sept 26, 2025 - Add cpuptemp alias command to create the coredns.yaml file
 if [[ hostname =~ [A-Z] ]]; then  echo ">>> WARNING <<< hostname contains Capital Letters. When using microk8s the capital letters in the hostname will cause many different type of failures. Rename host name to all lower case to continue!"; exit 1; fi
 
-VER=3.2
+VER=3.3
 export DEFAULT_URL_CPTRAFFIC="http://juiceshop.lab"
 export DEFAULT_URL_CPAPI="http://vampi.lab"
 echo "Check Point WAF on Kubernetes Lab Alias Commands.  Use cphelp for list of commands. Ver: $VER"
@@ -24,18 +24,18 @@ alias kubectl=microk8s.kubectl
 alias ka="kubectl apply"
 alias kd="kubectl delete"
 alias kp="kubectl get pods -A"
+alias ks="kubectl get svc -A --output wide"
 alias helm='/snap/bin/microk8s.helm'
 export HOST_IP="`hostname -I| awk ' {print $1}'`"
 WAPAPP=cp-appsec-cloudguard-waf-ingress-nginx-controller
 
 if k get pods -A | grep -q -o 'cp-appsec' ; then 
-	INGRESS_IP="`microk8s.kubectl get  svc $WAPAPP -o json | jq -r  .status.loadBalancer.ingress[].ip`"
+	export	INGRESS_IP="`microk8s.kubectl get  svc $WAPAPP -o json | jq -r  .status.loadBalancer.ingress[].ip`"
 	get_WAFPOD ()  {
 	WAFPOD="`microk8s.kubectl get pods -o=jsonpath='{.items..metadata.name}' | grep cp-appsec`"
 	}
 fi
 
-#alias cptrbad='_cptrbad() { echo "Dec 2024  - Adapted for K8S Lab" ; url=$1 ;k exec -it  testhost  -n testhost -- bash -c "url=$url && cd /home/juice-shop-solver && python main.py $url";}; _cptrbad'
 alias cpwafciser='k exec -it wafciser -n wafciser -- bash /home/cp/cpwafciser.sh'
 alias wafciser='cpwafciser'
 alias cptraffic='k exec -it wafciser -n wafciser -- bash /home/cp/cp_traffic.sh'
@@ -55,9 +55,9 @@ alias cpnanor='get_WAFPOD && k exec -it $WAFPOD -- cpnano -s | grep -E "^Registr
 alias cphost='printf "Host IP address used: $HOST_IP \n"'
 alias cpingress='printf "Ingress IP address used: $INGRESS_IP \n"'
 alias cpmetallb='microk8s enable metallb:$INGRESS_IP-$INGRESS_IP'
-alias cpcurljuiceshop='curl -s -H "Host: juiceshop.lab"  $INGRESS_IP | head -n 5 ; echo "<Remainder Delete>"'
-alias cpcurlvampi='curl -s -H "Host: vampi.lab" $INGRESS_IP | head -n 5 '
-alias cpuptemp='echo "Updating coredns.yaml using coredns.yaml.template with local Host IP address of ${HOST_IP}" && \
+alias cpurltest='echo "Testing URL for Juiceshop Host" && curl -s -H "Host: juiceshop.lab"  $INGRESS_IP | grep -i -m 1 "OWASP" && 
+		 echo "Testing URL for VAMPI Host" && curl -s -H "Host: vampi.lab" $INGRESS_IP | grep -i -m 1 "VAmPI" |cut -c 15-86 '
+alias cpuptemp='echo "Updating coredns.yaml using coredns.yaml.template with local Host IP address of ${INGRESS_IP}" && \
 	         envsubst  < coredns.yaml.template > coredns.yaml '
 
 alias cpdnscheck='printf "DNS Values Check\n" && \
