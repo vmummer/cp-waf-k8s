@@ -1,0 +1,148 @@
+components: {}
+info:
+  description: Auto Generated Api Discovery Schema
+  title: API Discovery
+  version: 1.0.0
+openapi: 3.0.1
+paths:
+  /:
+    get:
+      parameters: []
+      responses:
+        '200':
+          description: OK
+      tags:
+      - /
+  /books/v1:
+    get:
+      parameters: []
+      responses:
+        '200':
+          description: OK
+      tags:
+      - books
+    post:
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example:
+                book_title: string example
+                secret: string example
+              properties:
+                book_title:
+                  type: string
+                secret:
+                  type: string
+              type: object
+      responses:
+        '200':
+          description: OK
+      tags:
+      - books
+  /books/v1/bookTitle10:
+    get:
+      parameters: []
+      responses:
+        '200':
+          description: OK
+      tags:
+      - books
+  /books/v1/cp-GCWAF-102:
+    get:
+      parameters: []
+      responses:
+        '200':
+          description: OK
+      tags:
+      - books
+  /users/v1:
+    get:
+      parameters: []
+      responses:
+        '200':
+          description: OK
+      tags:
+      - users
+  /users/v1/admin:
+    get:
+      parameters: []
+      responses:
+        '200':
+          description: OK
+      tags:
+      - users
+  /users/v1/cgwaf2/email:
+    put:
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example:
+                email: string example
+              properties:
+                email:
+                  type: string
+              required:
+              - email
+              type: object
+      responses:
+        '200':
+          description: OK
+      tags:
+      - users
+  /users/v1/login:
+    post:
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example:
+                password: string example
+                username: string example
+              properties:
+                password:
+                  type: string
+                username:
+                  type: string
+              type: object
+      responses:
+        '200':
+          description: OK
+      tags:
+      - users
+  /users/v1/name1:
+    get:
+      parameters: []
+      responses:
+        '200':
+          description: OK
+      tags:
+      - users
+  /users/v1/register:
+    post:
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example:
+                email: string example
+                password: string example
+                username: string example
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+                username:
+                  type: string
+              type: object
+      responses:
+        '200':
+          description: OK
+      tags:
+      - users
