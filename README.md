@@ -31,10 +31,9 @@ cd cp-waf-k8s
 
 source cpalias.sh          << Load Aliase commands
  
-*Enable MicroK8s Add-ons:
-microk8s enable dns  
-microk8s enable ingress 
-microk8s enable hostpath-storage
+*Enable MicroK8s Add-on by running the following setup.sh:
+
+./setup.sh
 
 * Configure the Metallb - Load Balancer with the following command.  It fills in the address required.
 cpmetallb
@@ -53,6 +52,19 @@ wget https://cloudguard-waf.i2.checkpoint.com/downloads/helm/ingress-nginx/cp-k8
 helm install cp-k8s-appsec-nginx-ingress-4.12.1.tgz --name-template cp-appsec \
 --set appsec.agentToken="cp-us-<Removed>"    << Replace with your own key
 
+*Create the coredns.yaml file by this aliase command to subsitute the ingress IP address for DNS resolution:
+
+cpingress
+
+k apply -f coredns.yaml     >> This should be done before loading the juiceshop.yaml and vampi.yaml, so you don't need to wait for
+                               DNS update.
+k apply -f ingress.yaml
+
+* Load the remainder pods:
+
+k apply -f juiceshop.yaml
+k apply -f vampi.yaml
+k apply -f wafciser.yaml
 
 
 [DEMO HERE]
@@ -63,11 +75,12 @@ cpnano -s			       # Check status of the WAF - needs to say "CloudGuard AppSec i
 
 cpnanol				       # Check to see if policy has been push and updated
                                        
-cpwafciser http://juiceshop.lab      # Use to generate good traffic 
+cpwafciser         # Use to generate good traffic - defaults to http://juiceshop.lab  
                                          - This just does a simple crawl of the Juiceshop website
-cpwafciser http://juiceshop.lab -m     # Use to generate questionable traffic on the Juiceshop website
+cpwafciser  -m     # Use to generate questionable traffic on the Juiceshop website
 
-cpwafciser -a api http://vampi.lab         # Used to train the WAF API gateway and with -m to create malicious traffic   -s SQL testing -v verbose
+cpwafciser -a api         # Used to train the WAF API gateway and with -m to create malicious traffic   -s SQL testing -v verbose
+                            Defaults to http://vampi.lab
 
 cpwafciser -h for other options
 

@@ -12,19 +12,6 @@ log() {
 
 log "🔧 Starting MicroK8s environment setup..."
 
-# Create namespace if it doesn't exist
-log "📁 Checking for namespace '$NAMESPACE'..."
-if microk8s kubectl get namespace "$NAMESPACE" &>/dev/null; then
-  log "✅ Namespace '$NAMESPACE' already exists."
-else
-  log "📁 Creating namespace '$NAMESPACE'..."
-  microk8s kubectl create namespace "$NAMESPACE" >> "$LOG_FILE" 2>&1
-  if [ $? -eq 0 ]; then
-    log "✅ Namespace '$NAMESPACE' created successfully."
-  else
-    log "❌ Failed to create namespace '$NAMESPACE'."
-  fi
-fi
 
 # Enable DNS
 log "📡 Enabling DNS add-on (CoreDNS)..."
@@ -53,10 +40,10 @@ else
   log "❌ HostPath storage enable failed. See log for details."
 fi
 
-# Apply Kubernetes manifests
-log "📄 Applying Kubernetes manifests..."
+# Apply Kubernetes namespace 
+log "📄 Applying Kubernetes namespace "
 
-for manifest in namespace.yaml coredns.yaml juiceshop.yaml vampi.yaml wafciser.yaml; do
+for manifest in namespace.yaml ; do
   log "📄 Applying $manifest..."
   microk8s kubectl apply -f "$manifest" >> "$LOG_FILE" 2>&1
   if [ $? -eq 0 ]; then
