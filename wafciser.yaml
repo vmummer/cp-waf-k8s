@@ -8,7 +8,7 @@ spec:
   containers:
   - name: cp-wapciser 
     #    image: vmummer/cpwaftesthost:latest.rfhardened
-    image: vmummer/cpwafciser:25-09-30
+    image: vmummer/cpwafciser:25-10-22
     imagePullPolicy: Always
 #
     env:

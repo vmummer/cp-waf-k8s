@@ -5,12 +5,15 @@ set -euo pipefail
 # Written by Vince Mammoliti - vincem@checkpoint.com
 # 25 Sept 08-  Combined of a few applicaiton into single for simplicity
 # 25 Sept 23 - Removed HOST_API definition in vampi malicious
-# 
+# 25 Oct  16 - Stripped the URL hostname anything after the first / for host check
+# 25 Oct  21 - Added for Check Point WAF in ifblocked check
 
 # Script metadata
-VERSION="1.0.3"
+VERSION="1.0.5"
 SCRIPT_NAME=$(basename "$0")
 CURL_TIMEOUT=30
+
+
 CURL_CONNECTTIMEOUT=10
 
 # Color setup
@@ -199,8 +202,8 @@ gettoken() {
 
 # Check if response was blocked by WAF
 ifblocked() {
-  if echo "$OUTPUT" | grep -q -o -P '.{0,20}Application Security.{0,4}'; then
-    echo -e "${RED}Check Point - Application Security Blocked ${NC}"
+  if echo "$OUTPUT" | grep -q -o  "CloudGuard WAF"; then
+    echo -e "${RED}Check Point WAF - Application Security Blocked ${NC}"
   fi
 }
 
@@ -240,6 +243,9 @@ hostcheck() {
   stripped_host="${stripped_host#https://}"
   stripped_host="${stripped_host%%:*}"
 
+  # Extract just the hostname (before any slash)
+  stripped_host="${stripped_host%%/*}"
+
   if timeout 5 getent hosts "$stripped_host" > /dev/null; then
     echo "✅ Hostname '$stripped_host' resolved successfully."
   else
@@ -257,7 +263,7 @@ traffic_good_vampi() {
     loop=$((i + 1))
     echo "Loop: $loop"
     echo "1) GET /"
-    OUTPUT=$(curl_to -sS -H 'accept: application/json' -X 'GET' "${HOST}/")
+    OUTPUT=$(curl_to -sS -H 'accept: application/json' -X 'GET' "${HOST}")
     ifblocked
     $vResponse -e ${OUTPUT:0:$CHAR} "\n"
 
