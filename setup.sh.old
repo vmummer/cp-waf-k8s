@@ -1,0 +1,53 @@
+#!/bin/bash
+
+alias k=microk8s.kubectl
+LOG_FILE="microk8s-setup.log"
+TIMESTAMP=$(date '+%Y-%m-%d_%H-%M-%S')
+LOG_FILE="microk8s-setup-$TIMESTAMP.log"
+
+
+echo "🔧 Starting MicroK8s environment setup..." | tee -a "$LOG_FILE"
+
+# Enable DNS
+echo "�� Enabling DNS add-on (CoreDNS)..." | tee -a "$LOG_FILE"
+microk8s enable dns >> "$LOG_FILE" 2>&1
+if [ $? -eq 0 ]; then
+  echo "✅ DNS enabled. Internal service discovery is now active." | tee -a "$LOG_FILE"
+else
+  echo "❌ DNS enable failed. See log for details." | tee -a "$LOG_FILE"
+fi
+
+# Enable Ingress
+echo "🌐 Enabling Ingress controller (NGINX)..." | tee -a "$LOG_FILE"
+microk8s enable ingress >> "$LOG_FILE" 2>&1
+if [ $? -eq 0 ]; then
+  echo "✅ Ingress enabled. You can now expose services via HTTP/HTTPS." | tee -a "$LOG_FILE"
+else
+  echo "❌ Ingress enable failed. See log for details." | tee -a "$LOG_FILE"
+fi
+
+# Enable HostPath Storage
+echo "💾 Enabling HostPath storage..." | tee -a "$LOG_FILE"
+microk8s enable hostpath-storage >> "$LOG_FILE" 2>&1
+if [ $? -eq 0 ]; then
+  echo "✅ HostPath storage enabled. PVCs will use local disk paths." | tee -a "$LOG_FILE"
+else
+  echo "❌ HostPath storage enable failed. See log for details." | tee -a "$LOG_FILE"
+fi
+
+# Apply Kubernetes manifests
+log "📄 Applying Kubernetes manifests..."
+
+for manifest in namespace.yaml coredns.yaml juiceshop.yaml vampi.yaml webciser.yaml; do
+  log "📄 Applying $manifest..."
+  microk8s kubectl apply -f "$manifest" >> "$LOG_FILE" 2>&1
+  if [ $? -eq 0 ]; then
+    log "✅ $manifest applied successfully."
+  else
+    log "❌ Failed to apply $manifest. See log for details."
+  fi
+done
+
+
+echo "🎉 MicroK8s setup complete. Details logged to '$LOG_FILE'." | tee -a "$LOG_FILE"
+

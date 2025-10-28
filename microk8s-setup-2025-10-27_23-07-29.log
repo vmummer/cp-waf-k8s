@@ -1,0 +1,22 @@
+🔧 Starting MicroK8s environment setup...
+�� Enabling DNS add-on (CoreDNS)...
+Infer repository core for addon dns
+Addon core/dns is already enabled
+✅ DNS enabled. Internal service discovery is now active.
+🌐 Enabling Ingress controller (NGINX)...
+Infer repository core for addon ingress
+Addon core/ingress is already enabled
+✅ Ingress enabled. You can now expose services via HTTP/HTTPS.
+💾 Enabling HostPath storage...
+Infer repository core for addon hostpath-storage
+Addon core/hostpath-storage is already enabled
+✅ HostPath storage enabled. PVCs will use local disk paths.
+namespace/webapps unchanged
+namespace/wafciser unchanged
+configmap/coredns unchanged
+deployment.apps/juiceshop configured
+service/juiceshop configured
+deployment.apps/vampi configured
+service/vampi configured
+error: the path "webciser.yaml" does not exist
+🎉 MicroK8s setup complete. Details logged to 'microk8s-setup-2025-10-27_23-07-29.log'.
