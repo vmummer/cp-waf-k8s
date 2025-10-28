@@ -16,7 +16,7 @@
 # Oct  28, 2025 - 3.5 changed metallb to use HOST_IP
 if [[ hostname =~ [A-Z] ]]; then  echo ">>> WARNING <<< hostname contains Capital Letters. When using microk8s the capital letters in the hostname will cause many different type of failures. Rename host name to all lower case to continue!"; exit 1; fi
 
-VER=3.4
+VER=3.5
 export DEFAULT_URL_CPTRAFFIC="http://juiceshop.lab"
 export DEFAULT_URL_CPAPI="http://vampi.lab"
 echo "Check Point WAF on Kubernetes Lab Alias Commands.  Use cphelp for list of commands. Ver: $VER"
@@ -88,8 +88,7 @@ cpingress        Shows the IP address of the Ingress Controller used
 cphelp           Alias Command to help with Check Point Lab
 cpapitrainer     Create API traffic to train WAF API gateway. Use -h for options
 cpmetallb        Enables the MicroK8s Metallb with the External IP of the Host system
-cpcurljuiceshop  Fetches Juiceshop Website via Exposed Ingress Controller
-cpcurlvampi      Fetches Vampi website via Exposed Ingress Controller
+cpcurltest       Fetches Juiceshop and VAmPI website via Exposed Ingress Controller
 cpdnscheck       Show CoreDNS Service IP and Resolve.conf for Testhost    
 cpuptemp         Update the local yaml files using templates and update with local IPs (coredns.yaml)
 wafciser         WAF - WEB and API Exerciser (Juiceshop and Vampi). user -h for usage and options

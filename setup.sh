@@ -53,5 +53,9 @@ for manifest in namespace.yaml ; do
   fi
 done
 
+echo "Deleting the default ingressclass for nginx"
+
+kubectl delete ingressclass nginx
+
 log "🎉 MicroK8s setup complete. Log saved to '$LOG_FILE'."
 
