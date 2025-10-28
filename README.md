@@ -38,12 +38,9 @@ source cpalias.sh          << Load Aliase commands
 * Configure the Metallb - Load Balancer with the following command.  It fills in the address required.
 cpmetallb
 
-* Setup the namespaces used for this enviornment.
-
-k apply -f namespace.yaml
 
 * From the Check Point Infinity Portal - Create a WAF asset
-* Fetch the Cloud Guard Helm Chart
+* Fetch the Cloud Guard WAF nginx based ingress controller image and the Helm Chart 
 
 wget https://cloudguard-waf.i2.checkpoint.com/downloads/helm/ingress-nginx/cp-k8s-appsec-nginx-ingress-4.12.1.tgz -O cp-k8s-appsec-nginx-ingress-4.12.1.tgz
 
