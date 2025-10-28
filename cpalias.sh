@@ -13,9 +13,10 @@
 # Sept 12  2025 - Fixed Metallb command
 # Sept 22, 2025 - Moved to namespace - webapps (juiceshop and Vampi) - wafciser (wafciser)
 # Sept 26, 2025 - Add cpuptemp alias command to create the coredns.yaml file
+# Oct  28, 2025 - 3.5 changed metallb to use HOST_IP
 if [[ hostname =~ [A-Z] ]]; then  echo ">>> WARNING <<< hostname contains Capital Letters. When using microk8s the capital letters in the hostname will cause many different type of failures. Rename host name to all lower case to continue!"; exit 1; fi
 
-VER=3.3
+VER=3.4
 export DEFAULT_URL_CPTRAFFIC="http://juiceshop.lab"
 export DEFAULT_URL_CPAPI="http://vampi.lab"
 echo "Check Point WAF on Kubernetes Lab Alias Commands.  Use cphelp for list of commands. Ver: $VER"
@@ -54,7 +55,8 @@ alias cpnanor='get_WAFPOD && k exec -it $WAFPOD -- cpnano -s | grep -E "^Registr
 #alias cpwipe='docker-compose down &&  docker system prune -a'
 alias cphost='printf "Host IP address used: $HOST_IP \n"'
 alias cpingress='printf "Ingress IP address used: $INGRESS_IP \n"'
-alias cpmetallb='microk8s enable metallb:$INGRESS_IP-$INGRESS_IP'
+#alias cpmetallb='microk8s enable metallb:$INGRESS_IP-$INGRESS_IP'
+alias cpmetallb='microk8s enable metallb:$HOST_IP-$HOST_IP'
 alias cpurltest='echo "Testing URL for Juiceshop Host" && curl -s -H "Host: juiceshop.lab"  $INGRESS_IP | grep -i -m 1 "OWASP" && 
 		 echo "Testing URL for VAMPI Host" && curl -s -H "Host: vampi.lab" $INGRESS_IP | grep -i -m 1 "VAmPI" |cut -c 15-86 '
 alias cpuptemp='echo "Updating coredns.yaml using coredns.yaml.template with local Host IP address of ${INGRESS_IP}" && \
