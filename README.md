@@ -63,10 +63,12 @@ cpnano -s			       # Check status of the WAF - needs to say "CloudGuard AppSec i
 
 cpnanol				       # Check to see if policy has been push and updated
                                        
-cpwafciser http://juiceshop.lab:80        # Use to generate good traffic 
+cpwafciser http://juiceshop.lab      # Use to generate good traffic 
                                          - This just does a simple crawl of the Juiceshop website
-cpwafciser http://juiceshop.lab:80 -m     # Use to generate questionable traffic on the Juiceshop website
+cpwafciser http://juiceshop.lab -m     # Use to generate questionable traffic on the Juiceshop website
 
-cpwafciser http://vampi.lab:00            # Used to train the WAF API gateway and with -m to create malicious traffic 
+cpwafciser -a api http://vampi.lab         # Used to train the WAF API gateway and with -m to create malicious traffic   -s SQL testing -v verbose
+
+cpwafciser -h for other options
 
 
