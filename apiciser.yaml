@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: apiciser 
+  name: apiciser 
+  namespace: webapps 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: apiciser 
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: apiciser 
+    spec:
+      containers:
+        - image: vmummer/api-sim:latest 
+          imagePullPolicy: IfNotPresent
+          name: apiciser 
+          env:
+          - name: TZ
+            value: America/Toronto 
+          ports:
+          - containerPort: 8000 
+          resources: {}
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: apiciser 
+  name: apiciser
+  namespace: webapps 
+spec:
+  ports:
+  - name: apiciser 
+    port: 8000 
+    protocol: TCP
+    targetPort: 8000 
+  selector:
+    app: apiciser 
+  type: ClusterIP 
+
+status:
+  loadBalancer: {}

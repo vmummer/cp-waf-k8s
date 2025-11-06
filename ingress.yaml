@@ -3,6 +3,7 @@ kind: Ingress
 metadata:
   name: juiceshopnginx 
   namespace: webapps 
+  annotations:
 
 spec:
  ingressClassName: nginx
@@ -33,5 +34,14 @@ spec:
            port: 
              number: 5000
 
-
+  - host: apiciser.lab
+    http:
+     paths:
+     - path: /
+       pathType: Prefix
+       backend:
+         service:
+           name: apiciser 
+           port:
+             number: 8000 
 

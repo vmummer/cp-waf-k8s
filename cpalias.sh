@@ -14,19 +14,45 @@
 # Sept 22, 2025 - Moved to namespace - webapps (juiceshop and Vampi) - wafciser (wafciser)
 # Sept 26, 2025 - Add cpuptemp alias command to create the coredns.yaml file
 # Oct  28, 2025 - 3.5 changed metallb to use HOST_IP
+# Nov  05, 2055 - 3.6 Added Microk8s check.
 if [[ hostname =~ [A-Z] ]]; then  echo ">>> WARNING <<< hostname contains Capital Letters. When using microk8s the capital letters in the hostname will cause many different type of failures. Rename host name to all lower case to continue!"; exit 1; fi
 
-VER=3.5
+VER=3.6
 export DEFAULT_URL_CPTRAFFIC="http://juiceshop.lab"
 export DEFAULT_URL_CPAPI="http://vampi.lab"
 echo "Check Point WAF on Kubernetes Lab Alias Commands.  Use cphelp for list of commands. Ver: $VER"
-alias k=microk8s.kubectl
-alias kubectl=microk8s.kubectl
+#!/bin/bash
+
+check_microk8s() {
+    if command -v microk8s >/dev/null 2>&1; then
+#        echo "✅ MicroK8s is installed"
+        # Check if MicroK8s is running
+        if microk8s status | grep -q "microk8s is running"; then
+            echo "✅ MicroK8s is intstalled and running"
+	    alias kubectl=microk8s.kubectl
+            alias helm='/snap/bin/microk8s.helm'
+            return 0
+        else
+            echo "❌ MicroK8s is installed but not running"
+            return 1
+        fi
+    else
+        echo "❌ MicroK8s is not installed"
+        echo "Please install MicroK8s using: sudo snap install microk8s --classic"
+        return 1
+    fi
+}
+
+# Call the function
+check_microk8s
+
+
+
+alias k="kubectl"
 alias ka="kubectl apply"
 alias kd="kubectl delete"
 alias kp="kubectl get pods -A"
 alias ks="kubectl get svc -A --output wide"
-alias helm='/snap/bin/microk8s.helm'
 export HOST_IP="`hostname -I| awk ' {print $1}'`"
 WAPAPP=cp-appsec-cloudguard-waf-ingress-nginx-controller
 
@@ -37,8 +63,7 @@ if k get pods -A | grep -q -o 'cp-appsec' ; then
 	}
 fi
 
-alias cpwafciser='k exec -it wafciser -n wafciser -- bash /home/cp/cpwafciser.sh'
-alias wafciser='cpwafciser'
+alias wafciser='k exec -it wafciser -n wafciser -- bash /home/cp/cpwafciser.sh'
 alias cptraffic='k exec -it wafciser -n wafciser -- bash /home/cp/cp_traffic.sh'
 alias cpapitrainer='k exec -it wafciser -n wafciser -- bash /home/cp/cpapitrlocal.sh'
 alias wafciserhost='k exec -it wafciser  -n wafciser -- bash'
@@ -82,16 +107,22 @@ cpnano           Show detail status of AppSec Agent ( use as cpnano -s)
 cpnanol          Show last update of the AppSec Agent
 cpuninstall      Uninstall AppSec Agent
 cpagenttoken     Install AppSec Agent and assign Token
-cptraffic        Juiceshop Traffic Generator
 cphost           Shows the IP address of the Host used
 cpingress        Shows the IP address of the Ingress Controller used
 cphelp           Alias Command to help with Check Point Lab
-cpapitrainer     Create API traffic to train WAF API gateway. Use -h for options
 cpmetallb        Enables the MicroK8s Metallb with the External IP of the Host system
 cpcurltest       Fetches Juiceshop and VAmPI website via Exposed Ingress Controller
 cpdnscheck       Show CoreDNS Service IP and Resolve.conf for Testhost    
 cpuptemp         Update the local yaml files using templates and update with local IPs (coredns.yaml)
+
 wafciser         WAF - WEB and API Exerciser (Juiceshop and Vampi). user -h for usage and options
+
+Kubectl Short Cuts
+k                kubectl
+ka               kubectl apply
+kd               kubectl delete
+kp               kubectl get pods -A 
+ks               kubectl get svc -A --output wide
 "' 
 # remote cpdtraffic and cpdapitrainer too confusing
 # cpdtraffic    Docker Based Testhost of cptraffic

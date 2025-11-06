@@ -9,7 +9,7 @@ set -euo pipefail
 # 25 Oct  21 - Added for Check Point WAF in ifblocked check
 
 # Script metadata
-VERSION="1.0.6"
+VERSION="1.0.5"
 SCRIPT_NAME=$(basename "$0")
 CURL_TIMEOUT=30
 
@@ -97,10 +97,6 @@ EOF
 curl_to() {
    curl --connect-timeout "$CURL_TIMEOUT" \
          --max-time "$CURL_CONNECTTIMEOUT" \
-         -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.5993.90 Safari/537.36" \
-         -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8" \
-         -H "Accept-Language: en-US,en;q=0.9" \
-         -H "Connection: keep-alive" \
          "$@"
     return 0
 }
@@ -206,7 +202,7 @@ gettoken() {
 
 # Check if response was blocked by WAF
 ifblocked() {
-  if echo "$OUTPUT" | grep -q -o  "Application Security"; then
+  if echo "$OUTPUT" | grep -q -o  "CloudGuard WAF"; then
     echo -e "${RED}Check Point WAF - Application Security Blocked ${NC}"
   fi
 }
@@ -241,7 +237,7 @@ checkdb() {
 
 
 hostcheck() {
-  echo -e "WAFciser v$VERSION is a unified WAF Test & Training Tool - by Vince Mammoliti - vincem@checkpoint.com & Co-conspirator Marlon Chung \n - Check Point Software 2025 (-h) for usage \n
+  echo -e "WAFciser v$VERSION is a unified WAF Test & Training Tool - by Vince Mammoliti - vincem@checkpoint.com \n - Check Point Software 2025 (-h) for usage \n
 "
   local stripped_host="${HOST#http://}"
   stripped_host="${stripped_host#https://}"
