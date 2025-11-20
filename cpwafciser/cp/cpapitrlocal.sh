@@ -10,6 +10,7 @@
 # Version 0.8  - May   1, 2025 - Added sqlmap --update functionality 
 # Version 0.9  - July  8, 2025 - Added check for symbolic link for /usr/bin/python 
 # Version 1.0  - Sept  5, 2025 - Added passing of System VAR of DEFAULT_URL_CPAPI
+# Version 1.1  - Oct  21, 2025 - Correct the search for CloudGuard WAF
 
 set -euo pipefail
 
@@ -124,7 +125,10 @@ exit 0
 
 
 ifblocked(){
-  if echo "$OUTPUT" |  grep -q -o -P '.{0,20}Application Security.{0,4}'; then
+#  if echo "$OUTPUT" |  grep -q -o -P '.{0,20}Application Security.{0,4}' ; then
+  echo ">>> Testing ifblocked" 
+  echo $OUTPUT
+  if echo "$OUTPUT" |  grep -q -o  "CloudGuard WAF"; then
         echo -e "${RED}Check Point - Application Security Blocked ${NC}"
   fi
 }

@@ -1,3 +1,5 @@
 cp.old/
 cp/data/
 cp/redis.db
+cp-k8s-appsec-nginx-ingress-4.12.1.tgz
+*.log

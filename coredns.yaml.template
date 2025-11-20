@@ -24,7 +24,7 @@ data:
     lab:53 {
       errors
       hosts {
-        ${HOST_IP}  juiceshop.lab vampi.lab 
+        ${INGRESS_IP} juiceshop.lab vampi.lab 
       }
     }
 kind: ConfigMap

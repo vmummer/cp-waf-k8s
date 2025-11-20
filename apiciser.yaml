@@ -3,28 +3,31 @@ kind: Deployment
 metadata:
   creationTimestamp: null
   labels:
-    app: vampi 
-  name: vampi 
+    app: apiciser 
+  name: apiciser 
   namespace: webapps 
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: vampi
+      app: apiciser 
   strategy: {}
   template:
     metadata:
       creationTimestamp: null
       labels:
-        app: vampi 
+        app: apiciser 
     spec:
       containers:
-      - image: erev0s/vampi
-        imagePullPolicy: IfNotPresent
-        name: vampi 
-        ports:
-        - containerPort: 5000 
-        resources: {}
+        - image: vmummer/api-sim:latest 
+          imagePullPolicy: IfNotPresent
+          name: apiciser 
+          env:
+          - name: TZ
+            value: America/Toronto 
+          ports:
+          - containerPort: 8000 
+          resources: {}
 status: {}
 ---
 apiVersion: v1
@@ -32,17 +35,17 @@ kind: Service
 metadata:
   creationTimestamp: null
   labels:
-    app: vampi 
-  name: vampi 
+    app: apiciser 
+  name: apiciser
   namespace: webapps 
 spec:
   ports:
-  - name: vampi 
-    port: 5000
+  - name: apiciser 
+    port: 8000 
     protocol: TCP
-    targetPort: 5000
+    targetPort: 8000 
   selector:
-    app: vampi 
+    app: apiciser 
   type: ClusterIP 
 
 status:

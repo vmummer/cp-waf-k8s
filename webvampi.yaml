@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: external-vampi
+  namespace: default
+spec:
+  type: ExternalName
+  externalName: underthehoodapi.mycplabs.com 
+  ports:
+  - port: 5000
+
+---
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: external-service
+  namespace: default
+  annotations:
+#    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/proxy-body-size: 100m
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS" #important
+spec:
+  tls:
+  - hosts:
+    - vampi.web 
+    secretName: tls-external-service
+  rules:
+  - host: vampi.web 
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: external-vampi
+            port:
+              number: 5000 
