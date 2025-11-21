@@ -115,7 +115,7 @@ cpcurltest       Fetches Juiceshop and VAmPI website via Exposed Ingress Control
 cpdnscheck       Show CoreDNS Service IP and Resolve.conf for Testhost    
 cpuptemp         Update the local yaml files using templates and update with local IPs (coredns.yaml)
 
-wafciser         WAF - WEB and API Exerciser (Juiceshop and Vampi). user -h for usage and options
+wafciser         WAF - WEB and API Exerciser (Juiceshop and Vampi). -h for usage and options
 
 Kubectl Short Cuts
 k                kubectl
