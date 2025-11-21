@@ -2,3 +2,7 @@ cp.old/
 cp/data/
 cp/redis.db
 cp-k8s-appsec-nginx-ingress-4.12.1.tgz
+<<<<<<< HEAD
+=======
+*.log
+>>>>>>> c8ca93081ddcd54dc7e0f166da9408b6e1a542f5
