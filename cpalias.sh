@@ -14,14 +14,15 @@
 # Sept 22, 2025 - Moved to namespace - webapps (juiceshop and Vampi) - wafciser (wafciser)
 # Sept 26, 2025 - Add cpuptemp alias command to create the coredns.yaml file
 # Oct  28, 2025 - 3.5 changed metallb to use HOST_IP
-# Nov  05, 2055 - 3.6 Added Microk8s check.
+# Nov  05, 2025 - 3.6 Added Microk8s check.
+# Nov  24, 2025 - 3.7 Rerun ingress vararible after 
+
+VER=3.7
 if [[ hostname =~ [A-Z] ]]; then  echo ">>> WARNING <<< hostname contains Capital Letters. When using microk8s the capital letters in the hostname will cause many different type of failures. Rename host name to all lower case to continue!"; exit 1; fi
 
-VER=3.6
 export DEFAULT_URL_CPTRAFFIC="http://juiceshop.lab"
 export DEFAULT_URL_CPAPI="http://vampi.lab"
 echo "Check Point WAF on Kubernetes Lab Alias Commands.  Use cphelp for list of commands. Ver: $VER"
-#!/bin/bash
 
 check_microk8s() {
     if command -v microk8s >/dev/null 2>&1; then
@@ -56,11 +57,17 @@ alias ks="kubectl get svc -A --output wide"
 export HOST_IP="`hostname -I| awk ' {print $1}'`"
 WAPAPP=cp-appsec-cloudguard-waf-ingress-nginx-controller
 
+get_ingress (){
+	export  INGRESS_IP="`microk8s.kubectl get  svc $WAPAPP -o json | jq -r  .status.loadBalancer.ingress[].ip`"
+	} 
+
+ get_WAFPOD ()  {
+        WAFPOD="`microk8s.kubectl get pods -o=jsonpath='{.items..metadata.name}' | grep cp-appsec`"
+        }
+
 if k get pods -A | grep -q -o 'cp-appsec' ; then 
-	export	INGRESS_IP="`microk8s.kubectl get  svc $WAPAPP -o json | jq -r  .status.loadBalancer.ingress[].ip`"
-	get_WAFPOD ()  {
-	WAFPOD="`microk8s.kubectl get pods -o=jsonpath='{.items..metadata.name}' | grep cp-appsec`"
-	}
+	get_ingress
+	get_WAFPOD
 fi
 
 alias wafciser='k exec -it wafciser -n wafciser -- bash /home/cp/cpwafciser.sh'
@@ -77,11 +84,10 @@ alias cpnanol='get_WAFPOD && k exec -it $WAFPOD -- cpnano -s |grep -E "Policy|La
 
 alias cpnanos='get_WAFPOD && k exec -it $WAFPOD -- cpnano -s  ' 
 alias cpnanor='get_WAFPOD && k exec -it $WAFPOD -- cpnano -s | grep -E "^Registration status:" '
-#alias cpwipe='docker-compose down &&  docker system prune -a'
 alias cphost='printf "Host IP address used: $HOST_IP \n"'
 alias cpingress='printf "Ingress IP address used: $INGRESS_IP \n"'
 #alias cpmetallb='microk8s enable metallb:$INGRESS_IP-$INGRESS_IP'
-alias cpmetallb='microk8s enable metallb:$HOST_IP-$HOST_IP'
+alias cpmetallb='microk8s enable metallb:$HOST_IP-$HOST_IP && get_ingress'
 alias cpurltest='echo "Testing URL for Juiceshop Host" && curl -s -H "Host: juiceshop.lab"  $INGRESS_IP | grep -i -m 1 "OWASP" && 
 		 echo "Testing URL for VAMPI Host" && curl -s -H "Host: vampi.lab" $INGRESS_IP | grep -i -m 1 "VAmPI" |cut -c 15-86 '
 alias cpuptemp='echo "Updating coredns.yaml using coredns.yaml.template with local Host IP address of ${INGRESS_IP}" && \
