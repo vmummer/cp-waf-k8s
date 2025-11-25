@@ -29,7 +29,7 @@ check_microk8s() {
 #        echo "✅ MicroK8s is installed"
         # Check if MicroK8s is running
         if microk8s status | grep -q "microk8s is running"; then
-            echo "✅ MicroK8s is intstalled and running"
+            echo "✅ MicroK8s is installed and running"
 	    alias kubectl=microk8s.kubectl
             alias helm='/snap/bin/microk8s.helm'
             return 0

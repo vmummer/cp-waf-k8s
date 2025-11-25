@@ -7,7 +7,8 @@ NAMESPACE="dev-environment"
 
 # Function to log messages with timestamp
 log() {
-  echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" | tee -a "$LOG_FILE"
+  # echo "$(date '+%Y-%m-%d %H:%M:%S') - $1"  | tee -a "$LOG_FILE"
+   echo " - $1" 
 }
 
 log "🔧 Starting MicroK8s environment setup..."
@@ -19,7 +20,7 @@ microk8s enable dns >> "$LOG_FILE" 2>&1
 if [ $? -eq 0 ]; then
   log "✅ DNS enabled. Internal service discovery is now active."
 else
-  log "❌ DNS enable failed. See log for details."
+  log "❌ DNS enable failed."
 fi
 
 # Enable Ingress
@@ -28,7 +29,7 @@ microk8s enable ingress >> "$LOG_FILE" 2>&1
 if [ $? -eq 0 ]; then
   log "✅ Ingress enabled. You can now expose services via HTTP/HTTPS."
 else
-  log "❌ Ingress enable failed. See log for details."
+  log "❌ Ingress enable faileds."
 fi
 
 # Enable HostPath Storage
@@ -37,7 +38,7 @@ microk8s enable hostpath-storage >> "$LOG_FILE" 2>&1
 if [ $? -eq 0 ]; then
   log "✅ HostPath storage enabled. PVCs will use local disk paths."
 else
-  log "❌ HostPath storage enable failed. See log for details."
+  log "❌ HostPath storage enable failed."
 fi
 
 # Apply Kubernetes namespace 
@@ -49,13 +50,18 @@ for manifest in namespace.yaml ; do
   if [ $? -eq 0 ]; then
     log "✅ $manifest applied successfully."
   else
-    log "❌ Failed to apply $manifest. See log for details."
+    log "❌ Failed to apply $manifest."
   fi
 done
 
-echo "Deleting the default ingressclass for nginx"
+log "Deleting the default ingressclass for nginx, to prevent WAF Helm install conflict errors"
 
 microk8s.kubectl delete ingressclass nginx
+if [ $? -eq 0 ]; then
+    log "✅ Ingressclass default deleted successfully."
+  else
+    log "❌ Failed to delete default Ingressclass."
+  fi
 
-log "🎉 MicroK8s setup complete. Log saved to '$LOG_FILE'."
+log "🎉 MicroK8s setup complete."
 
