@@ -91,7 +91,7 @@ alias cpmetallb='microk8s enable metallb:$HOST_IP-$HOST_IP && get_ingress'
 alias cpurltest='echo "Testing URL for Juiceshop Host" && curl -s -H "Host: juiceshop.lab"  $INGRESS_IP | grep -i -m 1 "OWASP" && 
 		 echo "Testing URL for VAMPI Host" && curl -s -H "Host: vampi.lab" $INGRESS_IP | grep -i -m 1 "VAmPI" |cut -c 15-86 '
 alias cpuptemp='echo "Updating coredns.yaml using coredns.yaml.template with local Host IP address of ${INGRESS_IP}" && \
-	         envsubst  < coredns.yaml.template > coredns.yaml '
+	         get_ingress && envsubst  < coredns.yaml.template > coredns.yaml '
 
 alias cpdnscheck='printf "DNS Values Check\n" && \
 	printf "CoreDNS service ClusterIP: " && \

@@ -54,7 +54,7 @@ for manifest in namespace.yaml ; do
   fi
 done
 
-log "Deleting the default ingressclass for nginx, to prevent WAF Helm install conflict errors"
+log "📄 Deleting the default ingressclass for nginx, to prevent WAF Helm install conflict errors"
 
 microk8s.kubectl delete ingressclass nginx
 if [ $? -eq 0 ]; then
