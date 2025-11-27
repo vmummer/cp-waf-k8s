@@ -58,15 +58,8 @@ export HOST_IP="`hostname -I| awk ' {print $1}'`"
 WAPAPP=cp-appsec-cloudguard-waf-ingress-nginx-controller
 
 get_ingress (){
-    local svc_json
-    svc_json="$(microk8s.kubectl get svc "$WAPAPP" -o json 2>/dev/null) || svc_json='{}'"
-    # safe iteration with []? and fallback to empty
-    export INGRESS_IP="$(echo "$svc_json" | jq -r '.status.loadBalancer.ingress[]?.ip' 2>/dev/null || true)"
-    if [[ -z "${INGRESS_IP:-}" ]]; then
-        echo "Warning: Ingress IP not available for service $WAPAPP"
-        export INGRESS_IP=""
-    fi
-}
+	export  INGRESS_IP="`microk8s.kubectl get  svc $WAPAPP -o json | jq -r  .status.loadBalancer.ingress[].ip`"
+	} 
 
  get_WAFPOD ()  {
         WAFPOD="`microk8s.kubectl get pods -o=jsonpath='{.items..metadata.name}' | grep cp-appsec`"
@@ -97,8 +90,8 @@ alias cpingress='get_ingress && printf "Ingress IP address used: $INGRESS_IP \n"
 alias cpmetallb='microk8s enable metallb:$HOST_IP-$HOST_IP && get_ingress'
 alias cpurltest='echo "Testing URL for Juiceshop Host" && curl -s -H "Host: juiceshop.lab"  $INGRESS_IP | grep -i -m 1 "OWASP" && 
 		 echo "Testing URL for VAMPI Host" && curl -s -H "Host: vampi.lab" $INGRESS_IP | grep -i -m 1 "VAmPI" |cut -c 15-86 '
-alias cpuptemp='get_ingress && echo "Updating coredns.yaml using coredns.yaml.template with local Host IP address of ${INGRESS_IP}" && \
-	          envsubst  < coredns.yaml.template > coredns.yaml '
+alias cpuptemp='echo "Updating coredns.yaml using coredns.yaml.template with local Host IP address of ${INGRESS_IP}" && \
+	         get_ingress && envsubst  < coredns.yaml.template > coredns.yaml '
 
 alias cpdnscheck='printf "DNS Values Check\n" && \
 	printf "CoreDNS service ClusterIP: " && \
@@ -124,7 +117,7 @@ cphost           Shows the IP address of the Host used
 cpingress        Shows the IP address of the Ingress Controller used
 cphelp           Alias Command to help with Check Point Lab
 cpmetallb        Enables the MicroK8s Metallb with the External IP of the Host system
-cpurltest       Fetches Juiceshop and VAmPI website via Exposed Ingress Controller
+cpcurltest       Fetches Juiceshop and VAmPI website via Exposed Ingress Controller
 cpdnscheck       Show CoreDNS Service IP and Resolve.conf for Testhost    
 cpuptemp         Update the local yaml files using templates and update with local IPs (coredns.yaml)
 
