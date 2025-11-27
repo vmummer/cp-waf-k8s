@@ -6,10 +6,10 @@ set -euo pipefail
 # 25 Sept 08-  Combined of a few applicaiton into single for simplicity
 # 25 Sept 23 - Removed HOST_API definition in vampi malicious
 # 25 Oct  16 - Stripped the URL hostname anything after the first / for host check
-# 25 Nov  26 - Added for Check Point WAF in ifblocked check - 1.0.8
+# 25 Nov  26 - Added for Check Point WAF in ifblocked check
 
 # Script metadata
-VERSION="1.0.8a"
+VERSION="1.0.7"
 SCRIPT_NAME=$(basename "$0")
 CURL_TIMEOUT=30
 
@@ -206,10 +206,17 @@ gettoken() {
 
 # Check if response was blocked by WAF
 ifblocked() {
- if [[ "$OUTPUT" == *"Application Security"* || "$OUTPUT" == *"CloudGuard WAF has detected"* ]]; then
+  if echo "$OUTPUT" | grep -q -o  "Application Security"; then
     echo -e "${RED}Check Point WAF - Application Security Blocked ${NC}"
- fi
+  fi
 }
+#ifblocked() {
+# if [[ "$output" == *"Application Security"* || "$output" == *"CloudGuard WAF has detected"* ]]; then
+#    echo -e "${RED}Check Point WAF - Application Security Blocked ${NC}"
+#    echo -e "Reexecute the command directly to the non protected host URL"
+#    exit 1
+# fi
+#}
 
 
 
