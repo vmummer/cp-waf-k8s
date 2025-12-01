@@ -35,7 +35,6 @@ source cpalias.sh          << Load Aliase commands
 
 ./setup.sh
 
-
 * From the Check Point Infinity Portal - Create a WAF asset
 * Fetch the Cloud Guard WAF nginx based ingress controller image and the Helm Chart 
 
@@ -56,16 +55,19 @@ cpuptemp   >> uses the template and replace with the HOST_IP to allow juiceshop.
 
 k apply -f coredns.yaml     >> This should be done before loading the juiceshop.yaml and vampi.yaml, so you don't need to wait for
                                DNS update.
-k apply -f ingress.yaml
 
 * Load the remainder pods:
 
-k apply -f juiceshop.yaml
-k apply -f vampi.yaml
-k apply -f wafciser.yaml
+k apply -f juiceshop.yaml -f vampi.yaml -f wafciser.yaml
+
+* Load Ingress Controller
+
+k apply -f ingress.yaml
 
 cpdnscheck                >> Validates that both host are pointing to the external IP of the WAF
 cpurltest                 >> Check that both Juiceshop and Vampi are reachable via the WAF
+
+wafciser -i  http://vampi.webapps:5000  >> Initialize the VAmPI database
 
 [DEMO HERE]
 
@@ -83,5 +85,12 @@ cpwafciser -a api          # Used to train the WAF API gateway and with -m to cr
                               Defaults to http://vampi.lab
 
 cpwafciser -h for other options
+
+* WAFciser
+
+WAFciser is a demonstration tool designed to showcase the capabilities of a Check Point Web Application Firewall (WAF). The tool’s primary intent is to train the WAF using normal web traffic directed at a Juice Shop host and API traffic against a VAmPI host. Once the WAF has been trained and switched to protect mode, WAFciser is then used to generate malicious traffic targeting both the Juice Shop host and the VAmPI API host.
+<img width="8015" height="88" alt="image" src="https://github.com/user-attachments/assets/582bafc6-d3d8-4d50-a176-90f0926a96f4" />
+
+
 
 
