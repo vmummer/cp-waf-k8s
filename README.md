@@ -35,10 +35,6 @@ source cpalias.sh          << Load Aliase commands
 
 ./setup.sh
 
-* Configure the Metallb - Load Balancer with the following command.  It fills in the address required.
-
-cpmetallb
-
 
 * From the Check Point Infinity Portal - Create a WAF asset
 * Fetch the Cloud Guard WAF nginx based ingress controller image and the Helm Chart 
@@ -49,6 +45,10 @@ wget https://cloudguard-waf.i2.checkpoint.com/downloads/helm/ingress-nginx/cp-k8
 
 helm install cp-k8s-appsec-nginx-ingress-4.12.1.tgz --name-template cp-appsec \
 --set appsec.agentToken="cp-us-<Removed>"    << Replace with your own key
+
+* Configure the Metallb - Load Balancer with the following command.  It fills in the address required.
+
+cpmetallb
 
 *Create the coredns.yaml file by this aliase command to subsitute the ingress IP address for DNS resolution:
 
