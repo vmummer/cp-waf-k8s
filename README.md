@@ -88,8 +88,10 @@ cpwafciser -h for other options
 
 * WAFciser
 
-WAFciser is a demonstration tool designed to showcase the capabilities of a Check Point Web Application Firewall (WAF). The tool’s primary intent is to train the WAF using normal web traffic directed at a Juice Shop host and API traffic against a VAmPI host. Once the WAF has been trained and switched to protect mode, WAFciser is then used to generate malicious traffic targeting both the Juice Shop host and the VAmPI API host.
-<img width="8015" height="88" alt="image" src="https://github.com/user-attachments/assets/582bafc6-d3d8-4d50-a176-90f0926a96f4" />
+WAFciser is a demonstration tool designed to showcase the capabilities of a Check Point Web Application Firewall (WAF). 
+The tool’s primary intent is to train the WAF using normal web traffic directed at a Juice Shop host and API traffic against a VAmPI host. 
+Once the WAF has been trained and switched to protect mode, WAFciser is then used to generate malicious traffic targeting both the Juice Shop host and the VAmPI API host.
+
 
 
 
