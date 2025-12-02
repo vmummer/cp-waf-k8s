@@ -55,7 +55,7 @@ done
 
 echo "Deleting the default ingressclass for nginx"
 
-kubectl delete ingressclass nginx
+microk8s kubectl delete ingressclass nginx
 
 log "🎉 MicroK8s setup complete. Log saved to '$LOG_FILE'."
 
