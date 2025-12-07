@@ -15,9 +15,10 @@
 # Sept 26, 2025 - Add cpuptemp alias command to create the coredns.yaml file
 # Oct  28, 2025 - 3.5 changed metallb to use HOST_IP
 # Nov  05, 2025 - 3.6 Added Microk8s check.
-# Nov  24, 2025 - 3.7 Rerun ingress vararible after 
+# Nov  24, 2025 - 3.7 Rerun ingress vararible after
+# Dec  06, 2025 - 3.7.1 Added cpnanol - Registration, Manifest , Agent ID, Profile ID & Tenant ID
 
-VER=3.7
+VER=3.7.1
 if [[ hostname =~ [A-Z] ]]; then  echo ">>> WARNING <<< hostname contains Capital Letters. When using microk8s the capital letters in the hostname will cause many different type of failures. Rename host name to all lower case to continue!"; exit 1; fi
 
 export DEFAULT_URL_CPTRAFFIC="http://juiceshop.lab"
@@ -87,7 +88,7 @@ alias cpnanoc='get_WAFPOD && k exec -it $WAFPOD -- bash'
 alias cpuninstall='get_WAFPOD && k exec -it $WAFPOD --  /usr/sbin/cpnano --uninstall'
 alias cpagenttoken='get_WAFPOD && k exec -it $WAFPOD --  ./cp-nano-agent --token $TOKEN'
 # alias cptoken="bash cp/cp_token.sh"
-alias cpnanol='get_WAFPOD && k exec -it $WAFPOD -- cpnano -s |grep -E "Policy|Last" ' 
+alias cpnanol='get_WAFPOD && k exec -it $WAFPOD -- cpnano -s |grep -E "Policy|Last|Registration status|Manifest status|Agent ID|Profile ID|Tenant ID" ' 
 
 alias cpnanos='get_WAFPOD && k exec -it $WAFPOD -- cpnano -s  ' 
 alias cpnanor='get_WAFPOD && k exec -it $WAFPOD -- cpnano -s | grep -E "^Registration status:" '
