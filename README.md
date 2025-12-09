@@ -18,12 +18,15 @@ Instructions:
 * update apps and upgrade
 sudo apt update && sudo apt upgrade -y
 * Install git and jq
+
 sudo apt install git jq -y
 
 *Clone this repository
+
 git clone https://github.com/vmummer/cp-waf-k8s.git
 
 *Change into the cp-waf-k8s directory
+
 cd cp-waf-k8s
 
 *Load up alias file used in the lab to simplify command
@@ -51,9 +54,13 @@ cpmetallb
 
 *Create the coredns.yaml file by this aliase command to subsitute the ingress IP address for DNS resolution:
 
-cpuptemp   >> uses the template and replace with the HOST_IP to allow juiceshop.lab and vampi.lab to reslove to ingress controller
+cpuptemp
 
-k apply -f coredns.yaml     >> This should be done before loading the juiceshop.yaml and vampi.yaml, so you don't need to wait for
+>> uses the template and replace with the HOST_IP to allow juiceshop.lab and vampi.lab to reslove to ingress controller
+
+k apply -f coredns.yaml
+
+>> This should be done before loading the juiceshop.yaml and vampi.yaml, so you don't need to wait for
                                DNS update.
 
 * Load the remainder pods:
@@ -64,8 +71,13 @@ k apply -f juiceshop.yaml -f vampi.yaml -f wafciser.yaml
 
 k apply -f ingress.yaml
 
-cpdnscheck                >> Validates that both host are pointing to the external IP of the WAF
-cpurltest                 >> Check that both Juiceshop and Vampi are reachable via the WAF
+cpdnscheck
+
+>> Validates that both host are pointing to the external IP of the WAF
+
+cpurltest
+
+>> Check that both Juiceshop and Vampi are reachable via the WAF
 
 wafciser -i  http://vampi.webapps:5000  >> Initialize the VAmPI database
 
@@ -84,7 +96,7 @@ cpwafciser  -m     i       # Use to generate questionable traffic on the Juicesh
 cpwafciser -a api          # Used to train the WAF API gateway and with -m to create malicious traffic   -s SQL testing -v verbose
                               Defaults to http://vampi.lab
 
-cpwafciser -h for other options
+cpwafciser -h              #for other options
 
 * WAFciser
 
