@@ -13,23 +13,30 @@ The repository also includes a Client Host Pod used to generations web traffic, 
 Instructions:
  
 * Clone the repository
-* microK8s be installed, and run the following minimually:
+* microK8s is required to be installed. If not install. 
+
+sudo snap install microk8s --classic"
 
 * update apps and upgrade
+
 sudo apt update && sudo apt upgrade -y
+
 * Install git and jq
+
 sudo apt install git jq -y
 
 *Clone this repository
+
 git clone https://github.com/vmummer/cp-waf-k8s.git
 
 *Change into the cp-waf-k8s directory
+
 cd cp-waf-k8s
 
 *Load up alias file used in the lab to simplify command
 
 
-source cpalias.sh          << Load Aliase commands
+source cpalias.sh          
  
 *Enable MicroK8s Add-on by running the following setup.sh:
 
@@ -40,7 +47,8 @@ source cpalias.sh          << Load Aliase commands
 cpmetallb
 
 
-* From the Check Point Infinity Portal - Create a WAF asset
+** From the Check Point Infinity Portal - Create a WAF asset **
+
 * Fetch the Cloud Guard WAF nginx based ingress controller image and the Helm Chart 
 
 wget https://cloudguard-waf.i2.checkpoint.com/downloads/helm/ingress-nginx/cp-k8s-appsec-nginx-ingress-4.12.1.tgz -O cp-k8s-appsec-nginx-ingress-4.12.1.tgz
@@ -50,19 +58,20 @@ wget https://cloudguard-waf.i2.checkpoint.com/downloads/helm/ingress-nginx/cp-k8
 helm install cp-k8s-appsec-nginx-ingress-4.12.1.tgz --name-template cp-appsec \
 --set appsec.agentToken="cp-us-<Removed>"    << Replace with your own key
 
-*Create the coredns.yaml file by this aliase command to subsitute the ingress IP address for DNS resolution:
+*Create the coredns.yaml file by this aliase command to subsitute the ingress IP address for DNS resolutionr.
+*It uses the coredns.yaml.template and replace with the HOST_IP to allow juiceshop.lab and vampi.lab to reslove to ingress controller
 
-cpuptemp   >> uses the template and replace with the HOST_IP to allow juiceshop.lab and vampi.lab to reslove to ingress controller
+cpuptemp
 
-k apply -f coredns.yaml     >> This should be done before loading the juiceshop.yaml and vampi.yaml, so you don't need to wait for
-                               DNS update.
+k apply -f coredns.yaml    
+
+* This should be done before loading the juiceshop.yaml and vampi.yaml, so you don't need to wait for DNS update.
+
 k apply -f ingress.yaml
 
 * Load the remainder pods:
 
-k apply -f juiceshop.yaml
-k apply -f vampi.yaml
-k apply -f wafciser.yaml
+k apply -f juiceshop.yaml -f vampi.yaml -f wafciser.yaml
 
 cpdnscheck                >> Validates that both host are pointing to the external IP of the WAF
 cpurltest                 >> Check that both Juiceshop and Vampi are reachable via the WAF
