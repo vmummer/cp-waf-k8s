@@ -19,9 +19,10 @@
 # Dec  04, 2025 - 3.6.2 Added Tenant and UID to cpnanol command
 if [[ hostname =~ [A-Z] ]]; then  echo ">>> WARNING <<< hostname contains Capital Letters. When using microk8s the capital letters in the hostname will cause many different type of failures. Rename host name to all lower case to continue!"; exit 1; fi
 
-VER=3.6.3
+VER=3.6.4
 export DEFAULT_URL_CPTRAFFIC="http://juiceshop.lab"
 export DEFAULT_URL_CPAPI="http://vampi.lab"
+export WAF_CONTAINER_NAME="cloudguard-waf"
 echo "Check Point WAF on Kubernetes Lab Alias Commands.  Use cphelp for list of commands. Ver: $VER"
 #!/bin/bash
 
@@ -58,10 +59,10 @@ alias ks="kubectl get svc -A --output wide"
 export HOST_IP="`hostname -I| awk ' {print $1}'`"
 WAPAPP=cp-appsec-cloudguard-waf-ingress-nginx-controller
 
-if k get pods -A | grep -q -o 'cp-appsec' ; then 
+if kubectl get pods -A | grep -q -o 'cp-appsec' ; then 
 	export	INGRESS_IP="`microk8s.kubectl get  svc $WAPAPP -o json | jq -r  .status.loadBalancer.ingress[].ip`"
 	get_WAFPOD ()  {
-	WAFPOD="`microk8s.kubectl get pods -o=jsonpath='{.items..metadata.name}' | grep cp-appsec`"
+	export WAFPOD="`microk8s.kubectl get pods -o=jsonpath='{.items..metadata.name}' | grep cp-appsec`"
 	}
 fi
 
@@ -76,7 +77,22 @@ alias cpuninstall='get_WAFPOD && k exec -it $WAFPOD --  /usr/sbin/cpnano --unins
 alias cpagenttoken='get_WAFPOD && k exec -it $WAFPOD --  ./cp-nano-agent --token $TOKEN'
 # alias cptoken="bash cp/cp_token.sh"
 
-alias cpnanol='get_WAFPOD && k exec -it $WAFPOD -- cpnano -s |GREP_COLORS='mt=37' grep -E --color=always  "Policy|Last|Registration status|Manifest statusi|Agent ID|Profile ID|Tenant ID|Status: |---- "'
+alias cpnanol='get_WAFPOD && k exec -it $WAFPOD -c $WAF_CONTAINER_NAME -- cpnano -s |GREP_COLORS='mt=37' grep -E --color=always  "Policy|Last|Registration status|Manifest statusi|Agent ID|Profile ID|Tenant ID|Status: |---- "'
+
+get_policy_version() {
+	microk8s.kubectl exec -it "$WAFPOD"  -- cpnano -s  2>/dev/null  | \
+          grep "^Policy version:" | awk -F':' '{print $2}' | tr -d ' '
+	}
+
+cpnanow() {
+	echo "Watching for Policy Version Number Change. Press Ctrl+C to stop."
+	while true; do
+        POLICY_VER=$(get_policy_version)
+        echo "Policy Version: $POLICY_VER"
+        sleep 5
+	done
+}
+
 
 
 alias cpnanos='get_WAFPOD && k exec -it $WAFPOD -- cpnano -s  ' 
@@ -86,8 +102,18 @@ alias cphost='printf "Host IP address used: $HOST_IP \n"'
 alias cpingress='printf "Ingress IP address used: $INGRESS_IP \n"'
 #alias cpmetallb='microk8s enable metallb:$INGRESS_IP-$INGRESS_IP'
 alias cpmetallb='microk8s enable metallb:$HOST_IP-$HOST_IP'
-alias cpurltest='echo "Testing URL for Juiceshop Host" && curl -s -H "Host: juiceshop.lab"  $INGRESS_IP | grep -i -m 1 "OWASP" && 
-		 echo "Testing URL for VAMPI Host" && curl -s -H "Host: vampi.lab" $INGRESS_IP | grep -i -m 1 "VAmPI" |cut -c 15-86 '
+alias cpurltest='
+echo "Testing URL response for Juice Shop and VAmPI Host";
+echo -e "\nJuice Shop Host Response:" ;
+curl -s -H "Host: juiceshop.lab"  $INGRESS_IP | GREP_COLORS='mt=37' grep -E --color=always -i -m 1 "OWASP" \
+	&& echo -e  "\nJuice Shop:✅ SUCCESS"\
+	|| echo -e  "\nJuice Shop:❌ Failed to Respond. Check if Pod is deployed and running";
+
+echo -e "\nVAmPI Host Response:" ;
+curl -s -H "Host: vampi.lab" $INGRESS_IP | grep -i -m 1 "VAmPI" \
+	&& (echo "$REPLY" | cut -c 15-86; echo -e "\nVAmPI:✅ SUCCESS")\
+        || echo -e "\nVAmPI:❌ Failed to Respond. Check if Pod is deployed and running";	'
+
 alias cpuptemp='echo "Updating coredns.yaml using coredns.yaml.template with local Host IP address of ${INGRESS_IP}" && \
 	         envsubst  < coredns.yaml.template > coredns.yaml '
 
@@ -107,10 +133,11 @@ alias cpdnscheck='printf "DNS Values Check\n" && \
 
 alias cphelp='printf "Check Point Lab Commands:     Ver: $VER
 written by - Vince Mammoliti - vincem@checkpoint.com \n
-cpnano           Show detail status of AppSec Agent ( use as cpnano -s)
-cpnanol          Show last update of the AppSec Agent
-cpuninstall      Uninstall AppSec Agent
-cpagenttoken     Install AppSec Agent and assign Token
+cpnano           Show detail status of WAF Agent ( use as cpnano -s)
+cpnanol          Show last update of the WAF Agent
+cpnanow		 Used to watch for Agent Policy Version Change
+cpuninstall      Uninstall WAF Agent
+cpagenttoken     Install WAF Agent and assign Token
 cphost           Shows the IP address of the Host used
 cpingress        Shows the IP address of the Ingress Controller used
 cphelp           Alias Command to help with Check Point Lab
